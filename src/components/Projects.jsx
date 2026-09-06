@@ -6,9 +6,9 @@ const PROJECTS = [
   {
     title: "Hawak Kamay Scholarship Portal",
     description:
-      "A drag-and-drop task manager with boards, due dates, and local persistence.",
+      "A portal for students to find a scholarship program that fits their needs, with a user-friendly interface and a comprehensive database of available scholarships.",
     tech: ["PHP", "Tailwind", "MySQL"],
-    image: "/public/HKS.jpg",
+    image: "/HKS.jpg",
     live: "https://example.com",
     repo: "https://github.com/dropoflife13/HKSPS",
   },
@@ -17,7 +17,7 @@ const PROJECTS = [
     description:
       "A specialized workspace discovery platform for Iloilo City, enabling students and professionals to find co-working hubs.",
     tech: ["React", "Tailwind", "Node.js", "MongoDB"],
-    image: "/public/FlexSpace.jpg",
+    image: "/FlexSpace.jpg",
     live: "https://flexspace-iloilo.vercel.app/",
     repo: "https://github.com/dropoflife13/flexspace",
   },
