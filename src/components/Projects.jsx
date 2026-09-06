@@ -1,6 +1,8 @@
 import { motion } from "framer-motion";
 import { ExternalLink } from "lucide-react";
 import { FaGithub } from "react-icons/fa";
+import hksImage from "../assets/HKS.jpg";
+import flexSpaceImage from "../assets/FlexSpace.jpg";
 
 const PROJECTS = [
   {
@@ -8,7 +10,7 @@ const PROJECTS = [
     description:
       "A portal for students to find a scholarship program that fits their needs, with a user-friendly interface and a comprehensive database of available scholarships.",
     tech: ["PHP", "Tailwind", "MySQL"],
-    image: "/HKS.jpg",
+    image: hksImage,
     live: "https://example.com",
     repo: "https://github.com/dropoflife13/HKSPS",
   },
@@ -17,7 +19,7 @@ const PROJECTS = [
     description:
       "A specialized workspace discovery platform for Iloilo City, enabling students and professionals to find co-working hubs.",
     tech: ["React", "Tailwind", "Node.js", "MongoDB"],
-    image: "/FlexSpace.jpg",
+    image: flexSpaceImage,
     live: "https://flexspace-iloilo.vercel.app/",
     repo: "https://github.com/dropoflife13/flexspace",
   },
