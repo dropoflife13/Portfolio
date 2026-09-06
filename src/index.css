@@ -1,0 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  background-color: #0a1128;
+  background-image:
+    radial-gradient(at 20% 15%, rgba(236, 72, 153, 0.22) 0px, transparent 50%),
+    radial-gradient(at 80% 10%, rgba(139, 92, 246, 0.25) 0px, transparent 50%),
+    radial-gradient(at 10% 70%, rgba(59, 130, 246, 0.2) 0px, transparent 50%),
+    radial-gradient(at 85% 85%, rgba(249, 115, 22, 0.16) 0px, transparent 50%);
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  min-height: 100vh;
+}
