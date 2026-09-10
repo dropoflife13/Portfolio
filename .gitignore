@@ -23,3 +23,8 @@ dist-ssr
 *.sln
 *.sw?
 .vercel
+
+# Tooling / local config
+.agents/
+.claude/
+skills-lock.json
