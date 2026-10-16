@@ -9,10 +9,44 @@ import {
 import { ArrowUpRight } from "lucide-react";
 import { FaGithub } from "react-icons/fa";
 import Reveal from "./Reveal";
-import hksImage from "../assets/HKS.jpg";
 import flexSpaceImage from "../assets/FlexSpace.jpg";
+import dugtongImage from "../assets/dugtong.png";
+import citemasImage from "../assets/citemas.png";
+import agrivetImage from "../assets/agrivet.png";
 import SectionLabel from "./SectionLabel";
+import { Badge } from "@/components/ui/badge";
+
 const PROJECTS = [
+  {
+    title: "Dugtong OJT",
+    tagline: "Track OJT hours without the paperwork",
+    description:
+      "A digital internship and OJT management platform built for Philippine schools and partner companies. Replaces paper logs with real-time hour tracking, coordinator dashboards, supervisor approval workflows, and automated report and certificate generation.",
+    tech: ["React", "Tailwind", "Node.js", "Express", "MongoDB"],
+    image: dugtongImage,
+    live: "https://dugtong-ojt.vercel.app/",
+    repo: "https://github.com/dropoflife13",
+  },
+  {
+    title: "CITEMAS Portal",
+    tagline: "Creative hub for CITE & Multimedia Arts",
+    description:
+      "A central digital collaborative platform for CITE & Multimedia Arts Studio to shape the future of digital creation. Powers student project collaboration, event registrations, talent directories, and dynamic digital portfolio showcases.",
+    tech: ["React", "Tailwind", "Node.js", "Firebase"],
+    image: citemasImage,
+    live: "https://citemas.vercel.app/",
+    repo: "https://github.com/dropoflife13",
+  },
+  {
+    title: "Agrivet",
+    tagline: "Stock & inventory management for agri-vet shops",
+    description:
+      "A practical inventory and sales platform designed for agricultural and veterinary shops. Keeps products, sales, suppliers, and expiry lots in clear view — engineered for reliability even when network connectivity drops.",
+    tech: ["React", "Tailwind", "Node.js", "MongoDB"],
+    image: agrivetImage,
+    live: "https://agrivete.vercel.app/",
+    repo: "https://github.com/dropoflife13",
+  },
   {
     title: "FlexSpace",
     tagline: "Workspace discovery for Iloilo City",
@@ -22,16 +56,6 @@ const PROJECTS = [
     image: flexSpaceImage,
     live: "https://flexspace-iloilo.vercel.app/",
     repo: "https://github.com/dropoflife13/flexspace",
-  },
-  {
-    title: "Hawak Kamay Scholarship Portal",
-    tagline: "Scholarship matching for students",
-    description:
-      "A portal for students to find a scholarship program that fits their needs, with a user-friendly interface and a comprehensive database of available scholarships.",
-    tech: ["PHP", "Tailwind", "MySQL"],
-    image: hksImage,
-    live: "https://example.com",
-    repo: "https://github.com/dropoflife13/HKSPS",
   },
 ];
 
@@ -137,12 +161,13 @@ function ProjectCard({ project, index }) {
 
           <div className="mt-6 flex flex-wrap gap-2">
             {project.tech.map((t) => (
-              <span
+              <Badge
                 key={t}
-                className="rounded-full border border-line px-3 py-1 text-xs text-ink-muted transition-colors duration-200 group-hover:border-accent/30"
+                variant="outline"
+                className="rounded-full border-line px-3 py-1 text-xs font-normal text-ink-muted transition-colors duration-200 group-hover:border-accent/30"
               >
                 {t}
-              </span>
+              </Badge>
             ))}
           </div>
 
