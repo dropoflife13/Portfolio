@@ -149,3 +149,18 @@ body::after {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Marquee edge fade + reduced-motion fallback (UX-04 / UX-05) */
+.marquee-mask {
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee {
+    animation: none !important;
+  }
+  .marquee-mask {
+    overflow-x: auto;
+  }
+}

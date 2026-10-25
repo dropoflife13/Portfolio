@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { GraduationCap } from "lucide-react";
 
 const STOPS = [
   {
@@ -27,7 +28,7 @@ const STOPS = [
     title: "Senior High",
     year: "2022 — 2023",
     school: "PHINMA University of Iloilo",
-    image: "/education/seniorhigh.jpg",
+    image: "/education/phinma.jpg",
     x: 420,
     y: 80,
     state: "past",
@@ -37,7 +38,7 @@ const STOPS = [
     title: "BS Information Technology",
     year: "2023 — 2027",
     school: "PHINMA University of Iloilo",
-    image: "/education/bsit.jpg",
+    image: "/education/phinma.jpg",
     x: 580,
     y: 140,
     state: "current",
@@ -155,15 +156,14 @@ export default function EducationRoadmap() {
                 />
               ) : (
                 <div className="flex h-full w-full flex-col items-center justify-center bg-gradient-to-br from-paperDeep to-[#0a1128] p-8 text-center">
-                  <div className="h-16 w-16 rounded-full border border-accent/30 bg-accent/5" />
-                  <p className="mt-6 font-mono text-[10px] uppercase tracking-widest text-ink-faint">
-                    Add photo
-                  </p>
-                  <p className="mt-3 font-serif text-2xl text-ink-muted">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-full border border-accent/30 bg-accent/5 text-accent">
+                    <GraduationCap size={26} strokeWidth={1.5} />
+                  </div>
+                  <p className="mt-6 font-serif text-2xl text-ink-muted">
                     {activeStop.title}
                   </p>
-                  <p className="mt-2 font-mono text-[10px] tracking-widest text-ink-faint/60">
-                    public{activeStop.image}
+                  <p className="mt-2 font-mono text-[10px] uppercase tracking-widest text-ink-faint/70">
+                    {activeStop.school}
                   </p>
                 </div>
               )}
