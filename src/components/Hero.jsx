@@ -1,17 +1,30 @@
+import { useEffect, useRef, useState } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 import {
-  motion,
-  useReducedMotion,
-  useScroll,
-  useTransform,
-} from "framer-motion";
-import { useRef } from "react";
-import { ArrowUpRight, ArrowDown } from "lucide-react";
+  ArrowUpRight,
+  Globe,
+  Sparkles,
+  Download,
+  Cpu,
+} from "lucide-react";
 import { FaGithub, FaLinkedin } from "react-icons/fa6";
-
-const fadeUp = {
-  initial: { opacity: 0, y: 12 },
-  animate: { opacity: 1, y: 0 },
-};
+import {
+  SiReact,
+  SiNextdotjs,
+  SiTypescript,
+  SiThreedotjs,
+  SiTailwindcss,
+  SiNodedotjs,
+  SiPostgresql,
+  SiSupabase,
+  SiMongodb,
+  SiFramer,
+  SiShadcnui,
+  SiVercel,
+  SiGit,
+  SiFigma,
+} from "react-icons/si";
+import { Marquee } from "@/components/ui/marquee";
 
 const CREDENTIALS = [
   { label: "GitHub", href: "https://github.com/dropoflife13", icon: FaGithub },
@@ -22,260 +35,357 @@ const CREDENTIALS = [
   },
 ];
 
-const AGENT_TAGS = [
-  {
-    code: "SEC",
-    role: "Security Agent",
-    pos: "top-4 left-4 sm:top-6 sm:left-8",
-    delay: 0,
-  },
-  {
-    code: "PM",
-    role: "Product Manager",
-    pos: "top-2 right-6 sm:top-4 sm:right-10",
-    delay: 0.35,
-  },
-  {
-    code: "SD",
-    role: "System Design",
-    pos: "top-[28%] -left-1 sm:left-2",
-    delay: 0.7,
-  },
-  {
-    code: "UX",
-    role: "UI/UX Architecture",
-    pos: "top-[32%] -right-1 sm:right-2",
-    delay: 1.05,
-  },
-  {
-    code: "DB",
-    role: "Database Architect",
-    pos: "bottom-[26%] left-2 sm:left-6",
-    delay: 1.4,
-  },
-  {
-    code: "IR",
-    role: "Implementation & Review",
-    pos: "bottom-[22%] right-3 sm:right-6",
-    delay: 1.75,
-  },
-  {
-    code: "GR",
-    role: "Growth & Pitch",
-    pos: "bottom-3 left-1/2 -translate-x-1/2",
-    delay: 2.1,
-  },
+const CORE_STACK = [
+  { name: "React", icon: SiReact, color: "#61DAFB" },
+  { name: "Next.js", icon: SiNextdotjs, color: "#FFFFFF" },
+  { name: "TypeScript", icon: SiTypescript, color: "#3178C6" },
+  { name: "Three.js", icon: SiThreedotjs, color: "#22D3EE" },
 ];
 
-export default function Hero() {
-  const sectionRef = useRef(null);
-  const shouldReduceMotion = useReducedMotion();
+const HERO_MARQUEE_SKILLS = [
+  { name: "React 19", icon: SiReact, color: "#61DAFB" },
+  { name: "Next.js", icon: SiNextdotjs, color: "#FFFFFF" },
+  { name: "TypeScript", icon: SiTypescript, color: "#3178C6" },
+  { name: "Three.js / WebGL", icon: SiThreedotjs, color: "#22D3EE" },
+  { name: "Tailwind CSS", icon: SiTailwindcss, color: "#38BDF8" },
+  { name: "Framer Motion", icon: SiFramer, color: "#FFFFFF" },
+  { name: "shadcn/ui", icon: SiShadcnui, color: "#FFFFFF" },
+  { name: "Node.js", icon: SiNodedotjs, color: "#5FA04E" },
+  { name: "PostgreSQL", icon: SiPostgresql, color: "#4F8FC7" },
+  { name: "Supabase", icon: SiSupabase, color: "#3ECF8E" },
+  { name: "MongoDB", icon: SiMongodb, color: "#47A248" },
+  { name: "Vercel", icon: SiVercel, color: "#FFFFFF" },
+  { name: "Git", icon: SiGit, color: "#F05032" },
+  { name: "Figma", icon: SiFigma, color: "#F24E1E" },
+];
 
-  // Parallax for the wordmark — moves slower than page scroll
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start start", "end start"],
-  });
-  const wordmarkY = useTransform(scrollYProgress, [0, 1], [0, 120]);
+const BENTO_TILE_BASE =
+  "group relative overflow-hidden rounded-2xl border border-white/10 bg-[#070d1f]/75 backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] hover:border-cyan-400/50 hover:shadow-[0_0_32px_rgba(34,211,238,0.14)]";
+
+export default function Hero() {
+  const shouldReduceMotion = useReducedMotion();
+  const iframeRef = useRef(null);
+  const [modelReady, setModelReady] = useState(false);
+  const [localTime, setLocalTime] = useState("");
+
+  useEffect(() => {
+    const updateClock = () => {
+      try {
+        const formatted = new Intl.DateTimeFormat("en-US", {
+          timeZone: "Asia/Manila",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: true,
+        }).format(new Date());
+        setLocalTime(formatted);
+      } catch {
+        setLocalTime("UTC+8");
+      }
+    };
+    updateClock();
+    const interval = setInterval(updateClock, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const downloadModel = () => {
+    const btn = iframeRef.current?.contentDocument?.getElementById("dl");
+    btn?.click();
+  };
 
   return (
     <section
-      ref={sectionRef}
       id="home"
-      className="relative flex min-h-screen flex-col justify-between overflow-hidden px-6 pt-28 pb-10 sm:pt-32 sm:pb-12"
+      className="relative overflow-hidden px-4 pt-24 pb-12 sm:px-6 sm:pt-28 sm:pb-16"
     >
-      {/* Giant background wordmark */}
-      <motion.div
-        aria-hidden="true"
-        style={{ y: shouldReduceMotion ? 0 : wordmarkY }}
-        className="pointer-events-none absolute inset-x-0 top-1/3 -z-10 select-none text-center"
-      >
-        <span className="font-serif text-[22vw] font-light leading-none tracking-tightest text-white/[0.025] sm:text-[20vw]">
-          NEIL
-        </span>
-      </motion.div>
-
-      <div className="mx-auto grid w-full max-w-page flex-1 grid-cols-1 items-center gap-12 lg:grid-cols-2">
-        {/* Left column — The Profile */}
+      <div className="mx-auto max-w-page">
+        {/* Top status bar */}
         <motion.div
-          {...fadeUp}
-          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          className="lg:pr-6"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+          className="mb-5 flex flex-wrap items-center justify-between gap-3 px-1"
         >
-          {/* Compact Avatar + Identity Header */}
-          <div className="flex items-center gap-4">
-            <div className="relative h-16 w-16 shrink-0">
-              <div
-                aria-hidden="true"
-                className="pointer-events-none absolute -inset-1 rounded-full bg-accent/25 blur-md"
-              />
-              <img
-                src="/profile.jpg"
-                alt="Neil Mar De Asis"
-                className="relative h-16 w-16 rounded-full border border-white/15 object-cover shadow-lg"
-              />
-              <span
-                aria-hidden="true"
-                className="absolute bottom-0.5 right-0.5 h-3 w-3 rounded-full border-2 border-[#0a1128] bg-cyan-400"
-              />
-            </div>
-
+          <div className="flex items-center gap-3">
+            <img
+              src="/profile.jpg"
+              alt="Neil Mar De Asis"
+              className="h-9 w-9 rounded-full border border-cyan-400/40 object-cover shadow-[0_0_12px_rgba(34,211,238,0.25)]"
+            />
             <div>
-              <p className="text-base font-medium tracking-tight text-ink">
+              <p className="text-sm font-medium tracking-tight text-white">
                 Neil Mar De Asis
               </p>
-              <p className="label mt-0.5">
-                AI Systems &amp; Frontend Developer · Iloilo, PH
+              <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-cyan-300/80">
+                Full-Stack Developer &amp; Systems Architect
               </p>
             </div>
           </div>
 
-          <h1 className="mt-8 text-[clamp(2.5rem,5.5vw,4.5rem)] font-light leading-[1.03] tracking-tight text-ink">
-            Architecting{" "}
-            <em className="italic font-normal text-accent">AI-governed</em>{" "}
-            software systems.
-          </h1>
+          <div className="flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3.5 py-1.5 backdrop-blur-md">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-400 opacity-75" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-cyan-400" />
+            </span>
+            <span className="font-mono text-[10px] uppercase tracking-widest text-white/75">
+              Neural Cortex v2.4 · Online
+            </span>
+          </div>
+        </motion.div>
 
-          <p className="mt-7 max-w-prose text-lg leading-relaxed text-ink-muted">
-            I&apos;m Neil. I build 3D knowledge engines and multi-agent
-            workflows using Next.js, React, and Gemini.
-          </p>
+        {/* Bento Box Grid */}
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {/* Tile 1 (Large, spans 2 cols, 2 rows): The 3D Brain iframe */}
+          <motion.div
+            data-cursor-interactive="true"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.05, ease: [0.22, 1, 0.36, 1] }}
+            className={`${BENTO_TILE_BASE} flex min-h-[420px] flex-col justify-between md:col-span-2 lg:col-span-2 lg:row-span-2 lg:min-h-[500px]`}
+          >
+            {/* Ambient radial glow behind the 3D Brain */}
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 -z-10 m-auto h-72 w-72 rounded-full bg-cyan-500/15 blur-[90px] transition-opacity duration-300 group-hover:opacity-100"
+            />
 
-          <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-4">
-            <a
-              href="#projects"
-              className="group inline-flex items-center gap-2 rounded-sm bg-accent px-5 py-3 text-sm font-medium text-paper transition-colors duration-200 hover:bg-accent-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/70"
-            >
-              See selected work
-              <ArrowUpRight
-                size={16}
-                className="transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+            {/* Top bar inside Tile 1 */}
+            <div className="relative z-20 flex items-center justify-between border-b border-white/[0.07] bg-black/40 px-4 py-3 backdrop-blur-md">
+              <div className="flex items-center gap-2">
+                <Cpu size={14} className="text-cyan-400" />
+                <span className="font-mono text-[11px] uppercase tracking-widest text-white/80">
+                  synaptic-constellation.webgl
+                </span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={downloadModel}
+                  disabled={!modelReady}
+                  title="Download 3D Brain (.glb)"
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1 font-mono text-[10px] text-white/70 transition-colors hover:border-cyan-400/50 hover:text-cyan-300 disabled:opacity-40"
+                >
+                  <Download size={11} />
+                  .GLB
+                </button>
+              </div>
+            </div>
+
+            {/* 3D Brain Iframe */}
+            <div className="relative flex-1">
+              <iframe
+                ref={iframeRef}
+                src="/synaptic-constellation-brain.html?embed"
+                className="h-full min-h-[340px] w-full border-0 lg:min-h-[400px]"
+                title="3D Neural Brain"
+                loading="eager"
+                onLoad={() => setModelReady(true)}
               />
-            </a>
+            </div>
+
+            {/* Required Caption Footer */}
+            <div className="relative z-20 flex items-center justify-between gap-2 border-t border-white/[0.08] bg-black/60 px-4 py-3 backdrop-blur-md">
+              <p className="font-mono text-xs text-cyan-200/90">
+                ↳ The 3D Neural Cortex. Built from scratch to govern my
+                architecture.
+              </p>
+              <span className="hidden shrink-0 rounded border border-cyan-400/30 bg-cyan-400/10 px-2 py-0.5 font-mono text-[10px] text-cyan-300 sm:inline-block">
+                Interactive 3D
+              </span>
+            </div>
+          </motion.div>
+
+          {/* Tile 2 (Large, spans 2 cols): The Intro Text */}
+          <motion.div
+            data-cursor-interactive="true"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
+            className={`${BENTO_TILE_BASE} flex flex-col justify-between p-6 sm:p-8 md:col-span-2 lg:col-span-2`}
+          >
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute -right-16 -top-16 h-52 w-52 rounded-full bg-cyan-400/10 blur-3xl transition-opacity duration-300 group-hover:opacity-100"
+            />
+
+            <div>
+              <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/25 bg-cyan-400/[0.07] px-3 py-1">
+                <Sparkles size={12} className="text-cyan-300" />
+                <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-cyan-200">
+                  Architecture · Systems · Craft
+                </span>
+              </div>
+
+              <h1 className="mt-5 text-[clamp(2rem,4vw,3.35rem)] font-light leading-[1.06] tracking-tight text-white">
+                I engineer software that{" "}
+                <span className="bg-gradient-to-r from-cyan-300 via-teal-200 to-sky-400 bg-clip-text font-normal italic text-transparent">
+                  feels finished.
+                </span>
+              </h1>
+
+              <p className="mt-4 max-w-2xl text-sm leading-relaxed text-ink-muted sm:text-base">
+                I&apos;m Neil, a full-stack developer specializing in React,
+                Next.js, and system architecture. I care deeply about clean code
+                and human-centered design. To keep my workflow strict, I built a
+                custom 3D Knowledge Engine.
+              </p>
+            </div>
+
+            <div className="mt-7 flex flex-wrap items-center justify-between gap-4 border-t border-white/[0.07] pt-5">
+              <div className="flex flex-wrap items-center gap-3">
+                <a
+                  href="#projects"
+                  className="group/btn inline-flex items-center gap-2 rounded-xl bg-cyan-400 px-4 py-2.5 text-xs font-semibold text-slate-950 shadow-[0_0_20px_rgba(34,211,238,0.3)] transition-all duration-200 hover:bg-cyan-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300"
+                >
+                  Explore Selected Work
+                  <ArrowUpRight
+                    size={15}
+                    className="transition-transform duration-200 group-hover/btn:-translate-y-0.5 group-hover/btn:translate-x-0.5"
+                  />
+                </a>
+
+                <a
+                  href="#factory"
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-white/15 bg-white/[0.03] px-4 py-2.5 font-mono text-xs text-white/85 transition-colors hover:border-cyan-400/50 hover:bg-white/[0.07] hover:text-cyan-200"
+                >
+                  Inspect CLI Factory
+                </a>
+              </div>
+
+              <div className="flex items-center gap-2">
+                {CREDENTIALS.map(({ label, href, icon: Icon }) => (
+                  <a
+                    key={label}
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={label}
+                    className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] text-ink-muted transition-colors duration-200 hover:border-cyan-400/50 hover:text-cyan-300"
+                  >
+                    <Icon size={15} />
+                  </a>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Tile 3 (Small): "Currently based in Iloilo, PH" with a globe icon */}
+          <motion.div
+            data-cursor-interactive="true"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.18, ease: [0.22, 1, 0.36, 1] }}
+            className={`${BENTO_TILE_BASE} flex flex-col justify-between p-6`}
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-cyan-400/30 bg-cyan-400/10 text-cyan-300 shadow-[0_0_20px_rgba(34,211,238,0.2)]">
+                <motion.div
+                  animate={shouldReduceMotion ? {} : { rotate: 360 }}
+                  transition={{
+                    duration: 24,
+                    repeat: Infinity,
+                    ease: "linear",
+                  }}
+                >
+                  <Globe size={20} />
+                </motion.div>
+              </div>
+
+              <span className="rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-wider text-emerald-300">
+                Available
+              </span>
+            </div>
+
+            <div className="mt-6">
+              <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-ink-faint">
+                Location · Base
+              </p>
+              <h2 className="mt-1.5 font-serif text-xl font-normal text-white">
+                Currently based in Iloilo, PH
+              </h2>
+              <p className="mt-2 font-mono text-xs text-cyan-300/80">
+                10.7202° N, 122.5621° E {localTime ? `· ${localTime}` : ""}
+              </p>
+            </div>
+          </motion.div>
+
+          {/* Tile 4 (Small): "Tech Stack" showing 4 mini icons (React, Next.js, TypeScript, Three.js) */}
+          <motion.div
+            data-cursor-interactive="true"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.24, ease: [0.22, 1, 0.36, 1] }}
+            className={`${BENTO_TILE_BASE} flex flex-col justify-between p-6`}
+          >
+            <div className="flex items-center justify-between">
+              <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-ink-faint">
+                Primary Engine
+              </p>
+              <span className="font-mono text-[10px] text-cyan-300/90">
+                04 Core
+              </span>
+            </div>
+
+            <div className="my-4">
+              <h2 className="font-serif text-xl font-normal text-white">
+                Tech Stack
+              </h2>
+              <div className="mt-3 grid grid-cols-2 gap-2.5">
+                {CORE_STACK.map(({ name, icon: Icon, color }) => (
+                  <div
+                    key={name}
+                    className="flex items-center gap-2.5 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 transition-colors duration-200 group-hover:border-white/15 hover:!border-cyan-400/50 hover:bg-white/[0.07]"
+                  >
+                    <Icon size={16} style={{ color }} className="shrink-0" />
+                    <span className="truncate font-mono text-xs text-white/85">
+                      {name}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
 
             <a
-              href="mailto:neilasis43@gmail.com"
-              className="inline-flex items-center gap-2 text-sm text-ink-muted transition-colors duration-200 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/70"
+              href="#skills"
+              className="inline-flex items-center gap-1 font-mono text-[11px] text-cyan-300/80 transition-colors hover:text-cyan-200"
             >
-              neilasis43@gmail.com
+              View full 37-tool matrix <ArrowUpRight size={12} />
             </a>
-          </div>
+          </motion.div>
 
-          {/* Credentials */}
-          <div className="mt-8 flex items-center gap-3">
-            {CREDENTIALS.map(({ label, href, icon: Icon }) => (
-              <a
-                key={label}
-                href={href}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={label}
-                className="flex h-9 w-9 items-center justify-center rounded-md border border-line text-ink-muted transition-colors duration-200 hover:border-accent/40 hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/70"
-              >
-                <Icon size={16} />
-              </a>
-            ))}
-          </div>
-        </motion.div>
+          {/* Tile 5 (Wide): Horizontal marquee of top skills scrolling infinitely */}
+          <motion.div
+            data-cursor-interactive="true"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            className={`${BENTO_TILE_BASE} flex flex-col justify-center px-5 py-4 md:col-span-2 lg:col-span-4`}
+          >
+            <div className="mb-3 flex items-center justify-between px-1">
+              <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-cyan-300/80">
+                Production Capabilities · Continuous Stream
+              </span>
+              <span className="font-mono text-[10px] uppercase tracking-widest text-ink-faint">
+                Full-Stack · 3D · Architecture
+              </span>
+            </div>
 
-        {/* Right column — The 3D Brain + 7 Floating Agent Tags */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.96 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.65, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-          className="relative flex items-center justify-center"
-        >
-          {/* Ambient radial glow so the 3D brain pops against the deep purple/blue grid */}
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-0 -z-10 m-auto h-[360px] w-[360px] rounded-full bg-cyan-500/15 blur-[95px] sm:h-[420px] sm:w-[420px]"
-          />
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-0 -z-10 m-auto h-[260px] w-[260px] rounded-full bg-accent/20 blur-[80px]"
-          />
-
-          <div className="relative w-full max-w-[560px]">
-            {/* Subtle orbital frame */}
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-6 rounded-full border border-white/[0.06] sm:inset-10"
-            />
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-14 rounded-full border border-dashed border-cyan-400/15 sm:inset-20"
-            />
-
-            {/* 3D Neural Brain Iframe */}
-            <iframe
-              src="/synaptic-constellation-brain.html?embed"
-              className="relative z-10 h-[500px] w-full border-0"
-              title="3D Neural Brain"
-              loading="eager"
-            />
-
-            {/* 7 Floating Agent Glass Tags */}
-            {AGENT_TAGS.map((agent) => (
-              <motion.div
-                key={agent.code}
-                title={agent.role}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={
-                  shouldReduceMotion
-                    ? { opacity: 1, scale: 1 }
-                    : {
-                        opacity: 1,
-                        scale: 1,
-                        y: [0, -6, 0],
-                      }
-                }
-                transition={
-                  shouldReduceMotion
-                    ? { duration: 0.3 }
-                    : {
-                        opacity: { duration: 0.4, delay: 0.25 + agent.delay * 0.15 },
-                        scale: { duration: 0.4, delay: 0.25 + agent.delay * 0.15 },
-                        y: {
-                          duration: 3.4,
-                          repeat: Infinity,
-                          ease: "easeInOut",
-                          delay: agent.delay,
-                        },
-                      }
-                }
-                className={`group absolute z-20 flex items-center gap-2 rounded-full border border-white/15 bg-black/60 px-3 py-1.5 backdrop-blur-md transition-all duration-200 hover:border-cyan-400/60 hover:bg-black/80 hover:shadow-[0_0_20px_rgba(34,211,238,0.25)] ${agent.pos}`}
-              >
-                <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_#22d3ee]" />
-                <span className="font-mono text-xs font-semibold tracking-wider text-white">
-                  {agent.code}
-                </span>
-                <span className="hidden text-[10px] text-white/60 sm:inline">
-                  · {agent.role}
-                </span>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
+            <Marquee className="[--duration:34s] py-1" repeat={3}>
+              {HERO_MARQUEE_SKILLS.map(({ name, icon: Icon, color }) => (
+                <div
+                  key={name}
+                  className="flex shrink-0 items-center gap-2.5 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-2 transition-colors duration-200 hover:border-cyan-400/40 hover:bg-white/[0.07]"
+                >
+                  <Icon size={16} style={{ color }} aria-hidden="true" />
+                  <span className="whitespace-nowrap font-mono text-xs font-medium text-white/85">
+                    {name}
+                  </span>
+                </div>
+              ))}
+            </Marquee>
+          </motion.div>
+        </div>
       </div>
-
-      {/* Scroll indicator */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.0, duration: 0.6 }}
-        className="mx-auto mt-8 flex max-w-page items-center justify-center gap-3 text-ink-faint"
-      >
-        <span className="font-mono text-[10px] uppercase tracking-[0.3em]">
-          Scroll
-        </span>
-        <motion.span
-          animate={shouldReduceMotion ? { y: 0 } : { y: [0, 6, 0] }}
-          transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
-          className="flex"
-        >
-          <ArrowDown size={14} />
-        </motion.span>
-      </motion.div>
     </section>
   );
 }

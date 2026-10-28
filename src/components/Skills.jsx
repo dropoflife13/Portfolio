@@ -2,12 +2,13 @@ import Reveal from "./Reveal";
 import { motion } from "framer-motion";
 import SectionLabel from "./SectionLabel";
 import { Marquee } from "@/components/ui/marquee";
-import { Clapperboard, Video } from "lucide-react";
+import { Clapperboard, Video, Cpu, Layers, Server, Wrench } from "lucide-react";
 import {
   SiReact,
   SiNextdotjs,
   SiTypescript,
   SiJavascript,
+  SiThreedotjs,
   SiHtml5,
   SiCss,
   SiTailwindcss,
@@ -36,32 +37,36 @@ import {
 } from "react-icons/si";
 import { RiOpenaiFill } from "react-icons/ri";
 
-// `color` is the brand colour — used for the icon in the marquee and on hover.
-// Dark brand colours (Next.js, Vercel, GitHub, Express, Radix, Cursor) are
-// lightened so they stay readable on the navy background.
 const GROUPS = [
   {
     number: "01",
-    title: "Frontend",
-    blurb: "Where I'm strongest — the layer I ship most often.",
+    title: "Frontend & 3D Interfaces",
+    span: "lg:col-span-7",
+    icon: Layers,
+    blurb:
+      "Architecting tactile, 60fps web applications, interactive 3D canvases, and accessible design systems.",
     items: [
       { name: "React", icon: SiReact, color: "#61DAFB" },
       { name: "Next.js", icon: SiNextdotjs, color: "#FFFFFF" },
       { name: "TypeScript", icon: SiTypescript, color: "#3178C6" },
+      { name: "Three.js", icon: SiThreedotjs, color: "#22D3EE" },
       { name: "JavaScript", icon: SiJavascript, color: "#F7DF1E" },
-      { name: "Tailwind", icon: SiTailwindcss, color: "#38BDF8" },
+      { name: "Tailwind CSS", icon: SiTailwindcss, color: "#38BDF8" },
       { name: "shadcn/ui", icon: SiShadcnui, color: "#FFFFFF" },
       { name: "Framer Motion", icon: SiFramer, color: "#FFFFFF" },
       { name: "Radix UI", icon: SiRadixui, color: "#E5E7EB" },
-      { name: "HTML", icon: SiHtml5, color: "#E34F26" },
-      { name: "CSS", icon: SiCss, color: "#1572B6" },
+      { name: "HTML5", icon: SiHtml5, color: "#E34F26" },
+      { name: "CSS3", icon: SiCss, color: "#1572B6" },
       { name: "Vite", icon: SiVite, color: "#A78BFA" },
     ],
   },
   {
     number: "02",
-    title: "Backend & Data",
-    blurb: "Where I'm leveling up — currently building real projects.",
+    title: "Backend & Data Systems",
+    span: "lg:col-span-5",
+    icon: Server,
+    blurb:
+      "Designing resilient APIs, append-only data schemas, and real-time persistence layers.",
     items: [
       { name: "Node.js", icon: SiNodedotjs, color: "#5FA04E" },
       { name: "Express", icon: SiExpress, color: "#E5E7EB" },
@@ -76,8 +81,11 @@ const GROUPS = [
   },
   {
     number: "03",
-    title: "Tools & Craft",
-    blurb: "How I move from an idea to something shipped.",
+    title: "Tooling & Production Craft",
+    span: "lg:col-span-6",
+    icon: Wrench,
+    blurb:
+      "Version control, CI/CD deployment pipelines, interface prototyping, and motion editing.",
     items: [
       { name: "Git", icon: SiGit, color: "#F05032" },
       { name: "GitHub", icon: SiGithub, color: "#FFFFFF" },
@@ -91,39 +99,38 @@ const GROUPS = [
   },
   {
     number: "04",
-    title: "AI in Practice",
+    title: "Agentic Systems & Governance",
+    span: "lg:col-span-6",
+    icon: Cpu,
     blurb:
-      "Not a shortcut — a second opinion. I use AI for code review, unfamiliar APIs, and catching my own assumptions before I ship.",
+      "Models and runtimes I orchestrate inside my custom 3D Knowledge Engine to enforce strict specification, database, and STRIDE security gates.",
     items: [
       { name: "Claude Code", icon: SiClaude, color: "#D97757" },
-      { name: "Claude", icon: SiClaude, color: "#D97757" },
-      { name: "ChatGPT", icon: RiOpenaiFill, color: "#74AA9C" },
-      { name: "Gemini", icon: SiGooglegemini, color: "#8AB4F8" },
-      { name: "Cursor", icon: SiCursor, color: "#E5E7EB" },
+      { name: "Anthropic Claude", icon: SiClaude, color: "#D97757" },
+      { name: "Google Gemini", icon: SiGooglegemini, color: "#8AB4F8" },
+      { name: "OpenAI API", icon: RiOpenaiFill, color: "#74AA9C" },
+      { name: "Cursor IDE", icon: SiCursor, color: "#E5E7EB" },
     ],
   },
 ];
 
 const TOTAL_TOOLS = GROUPS.reduce((n, g) => n + g.items.length, 0);
 
-// Two marquee rows, split so each row mixes groups and the rows move in
-// opposite directions.
 const ALL_ITEMS = GROUPS.flatMap((g) => g.items);
 const ROW_ONE = ALL_ITEMS.filter((_, i) => i % 2 === 0);
 const ROW_TWO = ALL_ITEMS.filter((_, i) => i % 2 === 1);
 
 function MarqueeChip({ name, icon: Icon, color }) {
   return (
-    <div className="group/chip flex shrink-0 items-center gap-3 rounded-xl border border-line bg-white/[0.03] px-5 py-3 backdrop-blur-sm transition-all duration-200 hover:border-accent/40 hover:bg-white/[0.06]">
-      <Icon size={22} style={{ color }} aria-hidden="true" />
-      <span className="whitespace-nowrap text-sm font-medium text-ink-muted transition-colors duration-200 group-hover/chip:text-ink">
+    <div className="group/chip flex shrink-0 items-center gap-3 rounded-xl border border-white/10 bg-[#070d1f]/80 px-5 py-3 backdrop-blur-md transition-all duration-200 hover:border-cyan-400/50 hover:bg-white/[0.06]">
+      <Icon size={20} style={{ color }} aria-hidden="true" />
+      <span className="whitespace-nowrap font-mono text-xs font-medium text-ink-muted transition-colors duration-200 group-hover/chip:text-white">
         {name}
       </span>
     </div>
   );
 }
 
-// Word-by-word fade for the headline
 function AnimatedWords({ text, delay = 0, className = "" }) {
   const words = text.split(" ");
   return (
@@ -155,26 +162,96 @@ export default function Skills() {
       <div className="mx-auto max-w-page">
         {/* Header */}
         <div className="flex flex-wrap items-center gap-3">
-          <SectionLabel number={4} text="Stack" />
-          <span className="font-mono text-[10px] uppercase tracking-widest text-ink-faint">
-            {`· ${GROUPS.length} groups · ${TOTAL_TOOLS} tools`}
+          <SectionLabel number={5} text="Stack · Bento Matrix" />
+          <span className="font-mono text-[10px] uppercase tracking-widest text-cyan-300/80">
+            {`· ${GROUPS.length} domains · ${TOTAL_TOOLS} tools`}
           </span>
         </div>
 
         <h2 className="mt-6 max-w-2xl text-4xl font-light leading-[1.05] text-ink sm:text-5xl">
-          <AnimatedWords text="What I work with," delay={0.1} />
+          <AnimatedWords text="The stack I engineer with," delay={0.1} />
           <br />
           <AnimatedWords
-            text="and where I'm headed."
+            text="and the systems I govern."
             delay={0.35}
             className="text-ink-muted"
           />
         </h2>
+
+        {/* Bento Box Grid for the 4 Stack Domains */}
+        <div className="mt-12 grid grid-cols-1 gap-4 lg:grid-cols-12">
+          {GROUPS.map((group, i) => {
+            const GroupIcon = group.icon;
+            return (
+              <Reveal
+                key={group.title}
+                delay={0.1 + i * 0.06}
+                className={group.span}
+              >
+                <div
+                  data-cursor-interactive="true"
+                  className="group relative flex h-full flex-col justify-between overflow-hidden rounded-2xl border border-white/10 bg-[#070d1f]/80 p-6 backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] hover:border-cyan-400/50 hover:shadow-[0_0_32px_rgba(34,211,238,0.14)] sm:p-8"
+                >
+                  <div
+                    aria-hidden="true"
+                    className="pointer-events-none absolute -right-12 -top-12 h-40 w-40 rounded-full bg-cyan-400/10 blur-3xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                  />
+
+                  <div>
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-cyan-400/30 bg-cyan-400/10 text-cyan-300">
+                          <GroupIcon size={18} />
+                        </div>
+                        <div>
+                          <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-cyan-300/80">
+                            Domain {group.number}
+                          </span>
+                          <h3 className="font-serif text-2xl font-normal text-white">
+                            {group.title}
+                          </h3>
+                        </div>
+                      </div>
+
+                      <span className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 font-mono text-[10px] text-white/50">
+                        {group.items.length} tools
+                      </span>
+                    </div>
+
+                    <p className="mt-4 max-w-xl text-sm leading-relaxed text-ink-muted">
+                      {group.blurb}
+                    </p>
+                  </div>
+
+                  {/* Tool Pills */}
+                  <div className="mt-6 flex flex-wrap gap-2 border-t border-white/[0.07] pt-5">
+                    {group.items.map(({ name, icon: Icon, color }) => (
+                      <div
+                        key={name}
+                        className="group/pill flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-3.5 py-2 transition-all duration-200 hover:-translate-y-0.5 hover:border-cyan-400/50 hover:bg-white/[0.07]"
+                      >
+                        <Icon
+                          size={15}
+                          style={{ color }}
+                          className="opacity-85 transition-opacity duration-200 group-hover/pill:opacity-100"
+                          aria-hidden="true"
+                        />
+                        <span className="font-mono text-xs text-white/80 transition-colors duration-200 group-hover/pill:text-white">
+                          {name}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </Reveal>
+            );
+          })}
+        </div>
       </div>
 
-      {/* Marquee — full-bleed, two rows moving in opposite directions */}
-      <Reveal delay={0.2}>
-        <div className="mt-14 space-y-4" aria-hidden="true">
+      {/* Full-bleed dual-row infinite marquee below the Bento Grid */}
+      <Reveal delay={0.25}>
+        <div className="mt-12 space-y-3" aria-hidden="true">
           <Marquee className="[--duration:45s]" repeat={3}>
             {ROW_ONE.map((item) => (
               <MarqueeChip key={item.name} {...item} />
@@ -187,79 +264,6 @@ export default function Skills() {
           </Marquee>
         </div>
       </Reveal>
-
-      <div className="mx-auto max-w-page">
-        {/* Groups */}
-        <div className="mt-20 space-y-16">
-          {GROUPS.map((group, i) => (
-            <Reveal key={group.title} delay={0.1 + i * 0.05}>
-              <div className="relative">
-                {/* Thin teal divider — full width, above each group */}
-                <motion.div
-                  initial={{ scaleX: 0 }}
-                  whileInView={{ scaleX: 1 }}
-                  viewport={{ once: true, margin: "-80px" }}
-                  transition={{
-                    duration: 0.7,
-                    delay: 0.1 + i * 0.05,
-                    ease: [0.22, 1, 0.36, 1],
-                  }}
-                  className="mb-8 h-px w-full origin-left bg-gradient-to-r from-accent/40 via-accent/10 to-transparent"
-                />
-
-                <div className="grid grid-cols-1 items-start gap-8 md:grid-cols-12 md:gap-12">
-                  {/* Left: number + title + blurb */}
-                  <div className="group/row md:col-span-5">
-                    <div className="flex items-start gap-6">
-                      <span className="font-serif text-4xl font-light leading-none text-white/15 transition-colors duration-500 group-hover/row:text-accent/60 sm:text-5xl">
-                        {group.number}
-                      </span>
-                      <div className="pt-1">
-                        <h3 className="font-serif text-2xl font-normal text-ink sm:text-3xl">
-                          {group.title}
-                        </h3>
-                        <p className="mt-3 text-sm leading-relaxed text-ink-muted sm:text-base">
-                          {group.blurb}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Right: pills, staggered */}
-                  <div className="md:col-span-7">
-                    <div className="flex flex-wrap gap-2.5">
-                      {group.items.map(({ name, icon: Icon, color }, j) => (
-                        <motion.div
-                          key={name}
-                          initial={{ opacity: 0, y: 8 }}
-                          whileInView={{ opacity: 1, y: 0 }}
-                          viewport={{ once: true, margin: "-60px" }}
-                          transition={{
-                            duration: 0.35,
-                            delay: 0.15 + i * 0.04 + j * 0.04,
-                            ease: [0.22, 1, 0.36, 1],
-                          }}
-                          className="group/pill flex items-center gap-2 rounded-full border border-line bg-white/[0.02] px-4 py-2 transition-all duration-200 hover:-translate-y-0.5 hover:border-accent/40 hover:bg-white/[0.04]"
-                        >
-                          <Icon
-                            size={16}
-                            style={{ color }}
-                            className="opacity-70 transition-opacity duration-200 group-hover/pill:opacity-100"
-                            aria-hidden="true"
-                          />
-                          <span className="text-sm text-ink-muted transition-colors duration-200 group-hover/pill:text-ink">
-                            {name}
-                          </span>
-                        </motion.div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-      </div>
     </section>
   );
 }

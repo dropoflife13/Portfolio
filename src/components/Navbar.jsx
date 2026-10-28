@@ -5,6 +5,7 @@ import { Menu, X } from "lucide-react";
 const NAV_LINKS = [
   { id: "home", label: "Index" },
   { id: "about", label: "About" },
+  { id: "factory", label: "Factory" },
   { id: "projects", label: "Projects" },
   { id: "skills", label: "Stack" },
   { id: "contact", label: "Contact" },
@@ -47,50 +48,50 @@ export default function Navbar() {
   };
 
   return (
-  <header
-  className="fixed top-0 left-0 right-0 z-50"
-  style={{
-    backdropFilter: "blur(24px) saturate(200%)",
-    WebkitBackdropFilter: "blur(24px) saturate(200%)",
-    background: isScrolled
-      ? "rgba(10, 17, 40, 0.22)"
-      : "rgba(10, 17, 40, 0.12)",
-    borderBottom: isScrolled
-      ? "1px solid rgba(255, 255, 255, 0.08)"
-      : "1px solid rgba(255, 255, 255, 0.05)",
-    boxShadow: isScrolled
-      ? "inset 0 1px 0 0 rgba(255, 255, 255, 0.06)"
-      : "inset 0 1px 0 0 rgba(255, 255, 255, 0.04)",
-    transition:
-      "background 300ms ease, border-color 300ms ease, box-shadow 300ms ease",
-  }}
->
+    <header
+      className="fixed left-0 right-0 top-0 z-50"
+      style={{
+        backdropFilter: "blur(24px) saturate(200%)",
+        WebkitBackdropFilter: "blur(24px) saturate(200%)",
+        background: isScrolled
+          ? "rgba(7, 13, 31, 0.72)"
+          : "rgba(7, 13, 31, 0.35)",
+        borderBottom: isScrolled
+          ? "1px solid rgba(34, 211, 238, 0.16)"
+          : "1px solid rgba(255, 255, 255, 0.06)",
+        boxShadow: isScrolled
+          ? "inset 0 1px 0 0 rgba(255, 255, 255, 0.06)"
+          : "inset 0 1px 0 0 rgba(255, 255, 255, 0.04)",
+        transition:
+          "background 300ms ease, border-color 300ms ease, box-shadow 300ms ease",
+      }}
+    >
       <nav className="mx-auto flex max-w-page items-center justify-between px-6 py-4">
         <button
           onClick={() => handleLinkClick("home")}
           aria-label="Back to top"
           className="font-serif text-lg font-normal tracking-tightest text-ink"
         >
-          Neil<span className="text-accent">.</span>
+          Neil<span className="text-cyan-400">.</span>
         </button>
 
         <div className="hidden items-center gap-10 md:flex">
-          <ul className="flex items-center gap-8">
+          <ul className="flex items-center gap-7">
             {NAV_LINKS.map((link) => {
               const isActive = activeSection === link.id;
               return (
                 <li key={link.id} className="relative">
                   <button
                     onClick={() => handleLinkClick(link.id)}
-                    className={`relative text-sm transition-colors duration-200 ${
+                    className={`relative font-mono text-xs uppercase tracking-widest transition-colors duration-200 ${
                       isActive
-                        ? "text-ink"
-                        : "text-ink-muted hover:text-ink"
+                        ? "text-cyan-300"
+                        : "text-ink-muted hover:text-white"
                     }`}
                   >
                     {link.label}
                     <span
-                      className={`absolute -bottom-2 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-accent transition-all duration-300 ${
+                      className={`absolute -bottom-2 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-cyan-400 transition-all duration-300 ${
                         isActive
                           ? "scale-100 opacity-100"
                           : "scale-0 opacity-0"
@@ -104,9 +105,9 @@ export default function Navbar() {
 
           <a
             href="mailto:neilasis43@gmail.com"
-            className="text-sm text-ink-muted transition-colors duration-200 hover:text-ink"
+            className="rounded-lg border border-white/10 bg-white/[0.03] px-3 py-1.5 font-mono text-xs text-ink-muted transition-colors duration-200 hover:border-cyan-400/40 hover:text-cyan-200"
           >
-            neilasis43@gmail.com <span className="text-accent">↗</span>
+            neilasis43@gmail.com <span className="text-cyan-400">↗</span>
           </a>
         </div>
 
@@ -153,10 +154,10 @@ export default function Navbar() {
             transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
             className="overflow-hidden md:hidden"
             style={{
-              background: "rgba(10, 17, 40, 0.95)",
+              background: "rgba(7, 13, 31, 0.96)",
               backdropFilter: "blur(20px) saturate(180%)",
               WebkitBackdropFilter: "blur(20px) saturate(180%)",
-              borderTop: "1px solid rgba(255, 255, 255, 0.06)",
+              borderTop: "1px solid rgba(255, 255, 255, 0.08)",
             }}
           >
             <ul className="flex flex-col gap-1 px-6 py-4">
@@ -169,9 +170,9 @@ export default function Navbar() {
                 >
                   <button
                     onClick={() => handleLinkClick(link.id)}
-                    className={`w-full py-3 text-left text-base transition-colors duration-200 ${
+                    className={`w-full py-3 text-left font-mono text-sm uppercase tracking-wider transition-colors duration-200 ${
                       activeSection === link.id
-                        ? "text-accent"
+                        ? "text-cyan-300"
                         : "text-ink-muted"
                     }`}
                   >
