@@ -16,12 +16,33 @@
   #dl{right:14px;background:#ffffff14;border:1px solid #ffffff33;border-radius:999px;padding:6px 14px;cursor:pointer;color:#fff;font:inherit;font-size:12px}
   #dl:focus-visible{outline:2px solid #9b30ff;outline-offset:2px}
   body.embed #hint,body.embed #dl{display:none}
+
+  /* Sleek glassmorphic node tooltip */
+  #node-tooltip {
+    position: absolute;
+    background: rgba(5,5,5,0.9);
+    border: 1px solid #00FFFF;
+    border-radius: 8px;
+    padding: 8px 12px;
+    color: white;
+    font-family: monospace;
+    font-size: 12px;
+    pointer-events: none;
+    display: none;
+    z-index: 100;
+    box-shadow: 0 0 15px rgba(0,255,255,0.3);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: opacity 0.2s;
+    white-space: nowrap;
+  }
 </style>
 </head>
 <body>
 <div id="stage"></div>
 <div id="hint">Drag to rotate</div>
 <button id="dl" type="button">Download .glb</button>
+<div id="node-tooltip"></div>
 <!--
   EMBED: <iframe src="synaptic-constellation-brain.html?embed" style="width:100%;height:520px;border:0" title="Synaptic constellation brain"></iframe>
   "?embed" = transparent background, no hint, no download button.
@@ -96,8 +117,18 @@ const NODE_RADIUS=0.5;      // pure white, unlit
 const LINK_OPACITY=0.3;     // hairline links
 const STOPS=[[0,'#a23bff'],[.35,'#5a60ff'],[.65,'#2fb0b0'],[1,'#2bff88']]; // purple -> blue -> teal -> green (left -> right)
 const SWAY=0.6;             // idle sway in radians (keeps purple on the left); 0 = off
+
+const agents = [
+  { name: 'Database Agent', file: 'dbaagent.md' },
+  { name: 'Security Agent', file: 'securityagent.md' },
+  { name: 'UI/UX Agent', file: 'uiuxagent.md' },
+  { name: 'Product Manager', file: 'productmanageragent.md' },
+  { name: 'Systems Design', file: 'systemsdesignagent.md' },
+  { name: 'Integration Agent', file: 'integrationagent.md' },
+  { name: 'Growth Agent', file: 'growthagent.md' }
+];
 /* -------------------------------------------- */
-const stage=document.getElementById('stage'),dl=document.getElementById('dl');
+const stage=document.getElementById('stage'),dl=document.getElementById('dl'),tooltip=document.getElementById('node-tooltip');
 if(!window.THREE){stage.textContent='Could not load three.js. Check your connection.';return;}
 if(/[?&]embed/.test(location.search))document.body.classList.add('embed');
 if(!THREE.GLTFExporter)dl.hidden=true;
@@ -135,19 +166,171 @@ const links=new THREE.LineSegments(lg,new THREE.LineBasicMaterial({vertexColors:
 links.name='Constellation_Links';
 
 const model=new THREE.Group();model.name='synaptic-constellation-brain';model.add(links,nodeMesh);
+
+/* ---------- Interactive 7 Agent Nodes (Beacons, Rings & Hit Proxies) ---------- */
+const agentMeshes=[];
+const agentHitObjects=[];
+const beaconGeom=new THREE.SphereGeometry(1.6,16,16);
+const hitGeom=new THREE.SphereGeometry(5.2,8,8);
+const hitMat=new THREE.MeshBasicMaterial({visible:false});
+
+agents.forEach((agent,i)=>{
+  if(!pts[i])return;
+  const p=pts[i];
+  const pos=new THREE.Vector3(p[0],p[1],p[2]);
+
+  // Glowing beacon sphere
+  const beacon=new THREE.Mesh(beaconGeom,new THREE.MeshBasicMaterial({color:0x00ffff}));
+  beacon.position.copy(pos);
+  model.add(beacon);
+
+  // Outer halo pulse ring
+  const ring=new THREE.Mesh(
+    new THREE.RingGeometry(2.2,2.9,24),
+    new THREE.MeshBasicMaterial({color:0x00ffff,side:THREE.DoubleSide,transparent:true,opacity:0.75})
+  );
+  ring.position.copy(pos);
+  model.add(ring);
+
+  // Invisible hit proxy for raycasting
+  const hitMesh=new THREE.Mesh(hitGeom,hitMat);
+  hitMesh.position.copy(pos);
+  hitMesh.userData={agent,index:i,pos,beacon,ring};
+  model.add(hitMesh);
+
+  agentMeshes.push({agent,beacon,ring,pos,index:i});
+  agentHitObjects.push(hitMesh);
+});
+
 const rig=new THREE.Group();rig.add(model);scene.add(rig);
 
-/* ---------- interaction: drag to rotate, gentle sway when idle ---------- */
+/* ---------- Tooltip Rendering & Raycast Logic ---------- */
+const raycaster=new THREE.Raycaster();
+const mouse=new THREE.Vector2();
+const tempV=new THREE.Vector3();
+let hoveredAgent=null,pinnedAgent=null;
+
+function positionTooltip(agentItem){
+  if(!agentItem||!agentItem.pos)return;
+  tempV.copy(agentItem.pos).applyMatrix4(model.matrixWorld);
+  tempV.project(camera);
+  const w=stage.clientWidth||innerWidth,h=stage.clientHeight||innerHeight;
+  const sx=(tempV.x*0.5+0.5)*w,sy=(-tempV.y*0.5+0.5)*h;
+  if(tempV.z<1){
+    const left=Math.min(w-220,Math.max(10,sx+14));
+    const top=Math.min(h-60,Math.max(10,sy-20));
+    tooltip.style.left=left+'px';
+    tooltip.style.top=top+'px';
+    tooltip.style.display='block';
+    tooltip.style.opacity='1';
+  }else{
+    tooltip.style.display='none';
+  }
+}
+
+function renderTooltip(agentItem){
+  if(!agentItem){
+    if(!pinnedAgent){
+      tooltip.style.display='none';
+      tooltip.style.opacity='0';
+    }
+    return;
+  }
+  const agent=agentItem.agent;
+  tooltip.innerHTML=`<div style="font-weight:700;color:#00FFFF;margin-bottom:3px;display:flex;align-items:center;gap:6px;">
+    <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#00FFFF;box-shadow:0 0 8px #00FFFF;"></span>
+    ${agent.name}
+  </div>
+  <div style="color:#cbd5e1;font-size:11px;opacity:0.9;">
+    📄 ${agent.file}
+  </div>`;
+  tooltip.style.display='block';
+  tooltip.style.opacity='1';
+  positionTooltip(agentItem);
+}
+
+function checkIntersection(clientX,clientY){
+  const rect=renderer.domElement.getBoundingClientRect();
+  mouse.x=((clientX-rect.left)/rect.width)*2-1;
+  mouse.y=-((clientY-rect.top)/rect.height)*2+1;
+  raycaster.setFromCamera(mouse,camera);
+
+  // 1. Raycast against 3D hit targets
+  const intersects=raycaster.intersectObjects(agentHitObjects);
+  if(intersects.length>0)return intersects[0].object.userData;
+
+  // 2. Proximity fallback in 2D screen space (< 26px)
+  let closest=null,minDist=26;
+  agentMeshes.forEach(item=>{
+    tempV.copy(item.pos).applyMatrix4(model.matrixWorld);
+    tempV.project(camera);
+    if(tempV.z<1){
+      const sx=(tempV.x*0.5+0.5)*rect.width+rect.left;
+      const sy=(-tempV.y*0.5+0.5)*rect.height+rect.top;
+      const dist=Math.hypot(clientX-sx,clientY-sy);
+      if(dist<minDist){minDist=dist;closest=item;}
+    }
+  });
+  return closest;
+}
+
+/* ---------- interaction: drag to rotate, hover/click nodes, gentle sway when idle ---------- */
 const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches,el=renderer.domElement;
-let yaw=0,pitch=0.5,vel=0,drag=false,lx=0,ly=0,idle=0;
-el.addEventListener('pointerdown',e=>{drag=true;lx=e.clientX;ly=e.clientY;el.setPointerCapture(e.pointerId);});
-el.addEventListener('pointermove',e=>{if(!drag)return;const dx=e.clientX-lx,dy=e.clientY-ly;lx=e.clientX;ly=e.clientY;
-  vel=dx*0.01;yaw+=vel;pitch=Math.max(-1.3,Math.min(1.3,pitch+dy*0.008));idle=0;});
-const up=()=>{drag=false;};el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up);
+let yaw=0,pitch=0.5,vel=0,drag=false,lx=0,ly=0,idle=0,downX=0,downY=0;
+el.addEventListener('pointerdown',e=>{
+  drag=true;
+  lx=e.clientX;ly=e.clientY;
+  downX=e.clientX;downY=e.clientY;
+  el.setPointerCapture(e.pointerId);
+});
+
+el.addEventListener('pointermove',e=>{
+  if(drag){
+    const dx=e.clientX-lx,dy=e.clientY-ly;
+    lx=e.clientX;ly=e.clientY;
+    vel=dx*0.01;yaw+=vel;pitch=Math.max(-1.3,Math.min(1.3,pitch+dy*0.008));idle=0;
+    return;
+  }
+  const hit=checkIntersection(e.clientX,e.clientY);
+  if(hit){
+    hoveredAgent=hit;
+    el.style.cursor='pointer';
+    renderTooltip(hit);
+  }else{
+    hoveredAgent=null;
+    el.style.cursor=drag?'grabbing':'grab';
+    if(!pinnedAgent){
+      tooltip.style.display='none';
+      tooltip.style.opacity='0';
+    }
+  }
+});
+
+const up=(e)=>{
+  drag=false;
+  const moved=Math.hypot(e.clientX-downX,e.clientY-downY);
+  if(moved<6){
+    const hit=checkIntersection(e.clientX,e.clientY);
+    if(hit){
+      pinnedAgent=(pinnedAgent&&pinnedAgent.index===hit.index)?null:hit;
+      hoveredAgent=hit;
+      renderTooltip(hit);
+    }else{
+      pinnedAgent=null;
+      hoveredAgent=null;
+      tooltip.style.display='none';
+      tooltip.style.opacity='0';
+    }
+  }
+};
+el.addEventListener('pointerup',up);
+el.addEventListener('pointercancel',up);
+
 function resize(){const w=stage.clientWidth||innerWidth,h=stage.clientHeight||innerHeight;
   renderer.setSize(w,h,false);camera.aspect=w/h;const t=Math.tan(camera.fov*Math.PI/360)*2;
   camera.position.set(0,0,Math.max(150/(t*camera.aspect),140/t));camera.updateProjectionMatrix();}
 if(window.ResizeObserver)new ResizeObserver(resize).observe(stage);addEventListener('resize',resize);resize();
+
 const clock=new THREE.Clock();
 (function tick(){requestAnimationFrame(tick);
   const dt=Math.min(clock.getDelta(),0.05),t=clock.elapsedTime;
@@ -155,7 +338,23 @@ const clock=new THREE.Clock();
     if(Math.abs(vel)>0.0005){yaw+=vel;vel*=0.95;}
     else if(!reduce&&SWAY>0&&idle>1.5)yaw+=(Math.sin(t*0.25)*SWAY-yaw)*0.02;
     pitch+=(0.5-pitch)*(idle>3?0.01:0);}
-  rig.rotation.y=yaw;rig.rotation.x=pitch;renderer.render(scene,camera);})();
+  rig.rotation.y=yaw;rig.rotation.x=pitch;
+
+  // Update halo orientation & pulsing
+  model.updateMatrixWorld(true);
+  agentMeshes.forEach((item,idx)=>{
+    item.ring.quaternion.copy(camera.quaternion);
+    const isAct=(hoveredAgent&&hoveredAgent.index===idx)||(pinnedAgent&&pinnedAgent.index===idx);
+    const pulse=isAct?1.45:(1+Math.sin(t*3.5+idx)*0.18);
+    item.ring.scale.set(pulse,pulse,1);
+    item.beacon.scale.setScalar(isAct?1.5:1);
+  });
+
+  const activeItem=hoveredAgent||pinnedAgent;
+  if(activeItem)positionTooltip(activeItem);
+
+  renderer.render(scene,camera);
+})();
 
 /* ---------- export as .glb ---------- */
 dl.addEventListener('click',()=>{if(!THREE.GLTFExporter)return;
