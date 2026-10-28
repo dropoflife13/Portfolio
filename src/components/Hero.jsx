@@ -186,11 +186,11 @@ export default function Hero() {
             {/* Required Caption Footer */}
             <div className="relative z-20 flex items-center justify-between gap-2 border-t border-white/[0.08] bg-black/60 px-4 py-3 backdrop-blur-md">
               <p className="font-mono text-xs text-cyan-200/90">
-                ↳ The 3D Neural Cortex. Built from scratch to govern my
-                architecture.
+                ↳ Live-connected to the Cortex API. Displaying real-time architecture.
               </p>
-              <span className="hidden shrink-0 rounded border border-cyan-400/30 bg-cyan-400/10 px-2 py-0.5 font-mono text-[10px] text-cyan-300 sm:inline-block">
-                Interactive 3D
+              <span className="hidden shrink-0 items-center gap-1.5 rounded border border-cyan-400/30 bg-cyan-400/10 px-2 py-0.5 font-mono text-[10px] text-cyan-300 sm:inline-flex">
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-cyan-400" />
+                Live Stream
               </span>
             </div>
           </motion.div>
