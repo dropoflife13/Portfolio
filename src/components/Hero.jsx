@@ -1,4 +1,9 @@
-import { motion, useScroll, useTransform } from "framer-motion";
+import {
+  motion,
+  useReducedMotion,
+  useScroll,
+  useTransform,
+} from "framer-motion";
 import { useRef } from "react";
 import { ArrowUpRight, ArrowDown } from "lucide-react";
 import { FaGithub, FaLinkedin } from "react-icons/fa6";
@@ -17,8 +22,54 @@ const CREDENTIALS = [
   },
 ];
 
+const AGENT_TAGS = [
+  {
+    code: "SEC",
+    role: "Security Agent",
+    pos: "top-4 left-4 sm:top-6 sm:left-8",
+    delay: 0,
+  },
+  {
+    code: "PM",
+    role: "Product Manager",
+    pos: "top-2 right-6 sm:top-4 sm:right-10",
+    delay: 0.35,
+  },
+  {
+    code: "SD",
+    role: "System Design",
+    pos: "top-[28%] -left-1 sm:left-2",
+    delay: 0.7,
+  },
+  {
+    code: "UX",
+    role: "UI/UX Architecture",
+    pos: "top-[32%] -right-1 sm:right-2",
+    delay: 1.05,
+  },
+  {
+    code: "DB",
+    role: "Database Architect",
+    pos: "bottom-[26%] left-2 sm:left-6",
+    delay: 1.4,
+  },
+  {
+    code: "IR",
+    role: "Implementation & Review",
+    pos: "bottom-[22%] right-3 sm:right-6",
+    delay: 1.75,
+  },
+  {
+    code: "GR",
+    role: "Growth & Pitch",
+    pos: "bottom-3 left-1/2 -translate-x-1/2",
+    delay: 2.1,
+  },
+];
+
 export default function Hero() {
   const sectionRef = useRef(null);
+  const shouldReduceMotion = useReducedMotion();
 
   // Parallax for the wordmark — moves slower than page scroll
   const { scrollYProgress } = useScroll({
@@ -31,12 +82,12 @@ export default function Hero() {
     <section
       ref={sectionRef}
       id="home"
-      className="relative overflow-hidden px-6 pt-28 pb-8 sm:pt-32 sm:pb-12"
+      className="relative flex min-h-screen flex-col justify-between overflow-hidden px-6 pt-28 pb-10 sm:pt-32 sm:pb-12"
     >
       {/* Giant background wordmark */}
       <motion.div
         aria-hidden="true"
-        style={{ y: wordmarkY }}
+        style={{ y: shouldReduceMotion ? 0 : wordmarkY }}
         className="pointer-events-none absolute inset-x-0 top-1/3 -z-10 select-none text-center"
       >
         <span className="font-serif text-[22vw] font-light leading-none tracking-tightest text-white/[0.025] sm:text-[20vw]">
@@ -44,33 +95,56 @@ export default function Hero() {
         </span>
       </motion.div>
 
-      <div className="mx-auto grid max-w-page grid-cols-1 items-center gap-14 md:grid-cols-12 md:gap-12">
-        {/* Left column */}
+      <div className="mx-auto grid w-full max-w-page flex-1 grid-cols-1 items-center gap-12 lg:grid-cols-2">
+        {/* Left column — The Profile */}
         <motion.div
           {...fadeUp}
           transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          className="md:col-span-7 md:pr-12"
+          className="lg:pr-6"
         >
-          <p className="label">Frontend developer · Iloilo, PH</p>
+          {/* Compact Avatar + Identity Header */}
+          <div className="flex items-center gap-4">
+            <div className="relative h-16 w-16 shrink-0">
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute -inset-1 rounded-full bg-accent/25 blur-md"
+              />
+              <img
+                src="/profile.jpg"
+                alt="Neil Mar De Asis"
+                className="relative h-16 w-16 rounded-full border border-white/15 object-cover shadow-lg"
+              />
+              <span
+                aria-hidden="true"
+                className="absolute bottom-0.5 right-0.5 h-3 w-3 rounded-full border-2 border-[#0a1128] bg-cyan-400"
+              />
+            </div>
 
-          <h1 className="mt-6 text-[clamp(2.5rem,6vw,4.5rem)] font-light leading-[1.02] text-ink">
-            I build interfaces
-            <br />
-            that feel{" "}
-            <em className="italic font-normal text-accent">finished</em>.
+            <div>
+              <p className="text-base font-medium tracking-tight text-ink">
+                Neil Mar De Asis
+              </p>
+              <p className="label mt-0.5">
+                AI Systems &amp; Frontend Developer · Iloilo, PH
+              </p>
+            </div>
+          </div>
+
+          <h1 className="mt-8 text-[clamp(2.5rem,5.5vw,4.5rem)] font-light leading-[1.03] tracking-tight text-ink">
+            Architecting{" "}
+            <em className="italic font-normal text-accent">AI-governed</em>{" "}
+            software systems.
           </h1>
 
-          <p className="mt-8 max-w-prose text-lg leading-relaxed text-ink-muted">
-            I'm Neil — a frontend developer working mostly in React and
-            Tailwind. Currently leveling up into full-stack with Next.js and
-            MongoDB, and building things that hold up under real use, not
-            just in a demo.
+          <p className="mt-7 max-w-prose text-lg leading-relaxed text-ink-muted">
+            I&apos;m Neil. I build 3D knowledge engines and multi-agent
+            workflows using Next.js, React, and Gemini.
           </p>
 
           <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-4">
             <a
               href="#projects"
-              className="group inline-flex items-center gap-2 rounded-sm bg-accent px-5 py-3 text-sm font-medium text-paper transition-colors duration-200 hover:bg-accent-soft"
+              className="group inline-flex items-center gap-2 rounded-sm bg-accent px-5 py-3 text-sm font-medium text-paper transition-colors duration-200 hover:bg-accent-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/70"
             >
               See selected work
               <ArrowUpRight
@@ -81,7 +155,7 @@ export default function Hero() {
 
             <a
               href="mailto:neilasis43@gmail.com"
-              className="inline-flex items-center gap-2 text-sm text-ink-muted transition-colors duration-200 hover:text-ink"
+              className="inline-flex items-center gap-2 text-sm text-ink-muted transition-colors duration-200 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/70"
             >
               neilasis43@gmail.com
             </a>
@@ -96,7 +170,7 @@ export default function Hero() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={label}
-                className="flex h-9 w-9 items-center justify-center rounded-md border border-line text-ink-muted transition-colors duration-200 hover:border-accent/40 hover:text-accent"
+                className="flex h-9 w-9 items-center justify-center rounded-md border border-line text-ink-muted transition-colors duration-200 hover:border-accent/40 hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/70"
               >
                 <Icon size={16} />
               </a>
@@ -104,36 +178,82 @@ export default function Hero() {
           </div>
         </motion.div>
 
-        {/* Right column — avatar + status */}
+        {/* Right column — The 3D Brain + 7 Floating Agent Tags */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
+          initial={{ opacity: 0, scale: 0.96 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.6, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-          className="flex flex-col items-center gap-6 md:col-span-5 md:items-end"
+          transition={{ duration: 0.65, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+          className="relative flex items-center justify-center"
         >
-          <div className="relative h-[220px] w-[220px] sm:h-[260px] sm:w-[260px] md:h-[280px] md:w-[280px]">
-            <div className="pointer-events-none absolute inset-0 -z-10 rounded-full bg-accent/20 blur-3xl" />
-            <img
-              src="/profile.jpg"
-              alt="Neil Mar De Asis"
-              className="block h-full w-full max-w-full rounded-full border border-line object-cover"
-            />
-          </div>
+          {/* Ambient radial glow so the 3D brain pops against the deep purple/blue grid */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 -z-10 m-auto h-[360px] w-[360px] rounded-full bg-cyan-500/15 blur-[95px] sm:h-[420px] sm:w-[420px]"
+          />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 -z-10 m-auto h-[260px] w-[260px] rounded-full bg-accent/20 blur-[80px]"
+          />
 
-          {/* Currently status */}
-          <div className="w-full max-w-[280px] rounded-lg border border-line bg-white/[0.02] p-4 text-left md:w-[280px]">
-            <div className="flex items-center gap-2">
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-75" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-accent" />
-              </span>
-              <span className="font-mono text-[10px] uppercase tracking-widest text-ink-faint">
-                Now
-              </span>
-            </div>
-            <p className="mt-2 text-sm leading-relaxed text-ink-muted">
-              Building with React &amp; Tailwind. Learning Next.js and MongoDB.
-            </p>
+          <div className="relative w-full max-w-[560px]">
+            {/* Subtle orbital frame */}
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-6 rounded-full border border-white/[0.06] sm:inset-10"
+            />
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-14 rounded-full border border-dashed border-cyan-400/15 sm:inset-20"
+            />
+
+            {/* 3D Neural Brain Iframe */}
+            <iframe
+              src="/synaptic-constellation-brain.html?embed"
+              className="relative z-10 h-[500px] w-full border-0"
+              title="3D Neural Brain"
+              loading="eager"
+            />
+
+            {/* 7 Floating Agent Glass Tags */}
+            {AGENT_TAGS.map((agent) => (
+              <motion.div
+                key={agent.code}
+                title={agent.role}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={
+                  shouldReduceMotion
+                    ? { opacity: 1, scale: 1 }
+                    : {
+                        opacity: 1,
+                        scale: 1,
+                        y: [0, -6, 0],
+                      }
+                }
+                transition={
+                  shouldReduceMotion
+                    ? { duration: 0.3 }
+                    : {
+                        opacity: { duration: 0.4, delay: 0.25 + agent.delay * 0.15 },
+                        scale: { duration: 0.4, delay: 0.25 + agent.delay * 0.15 },
+                        y: {
+                          duration: 3.4,
+                          repeat: Infinity,
+                          ease: "easeInOut",
+                          delay: agent.delay,
+                        },
+                      }
+                }
+                className={`group absolute z-20 flex items-center gap-2 rounded-full border border-white/15 bg-black/60 px-3 py-1.5 backdrop-blur-md transition-all duration-200 hover:border-cyan-400/60 hover:bg-black/80 hover:shadow-[0_0_20px_rgba(34,211,238,0.25)] ${agent.pos}`}
+              >
+                <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_#22d3ee]" />
+                <span className="font-mono text-xs font-semibold tracking-wider text-white">
+                  {agent.code}
+                </span>
+                <span className="hidden text-[10px] text-white/60 sm:inline">
+                  · {agent.role}
+                </span>
+              </motion.div>
+            ))}
           </div>
         </motion.div>
       </div>
@@ -142,14 +262,14 @@ export default function Hero() {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 1.2, duration: 0.6 }}
-        className="mx-auto mt-16 flex max-w-page items-center justify-center gap-3 text-ink-faint"
+        transition={{ delay: 1.0, duration: 0.6 }}
+        className="mx-auto mt-8 flex max-w-page items-center justify-center gap-3 text-ink-faint"
       >
         <span className="font-mono text-[10px] uppercase tracking-[0.3em]">
           Scroll
         </span>
         <motion.span
-          animate={{ y: [0, 6, 0] }}
+          animate={shouldReduceMotion ? { y: 0 } : { y: [0, 6, 0] }}
           transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
           className="flex"
         >
