@@ -164,3 +164,8 @@ body::after {
     overflow-x: auto;
   }
 }
+
+/* Data flowing through Factory connection lines */
+@keyframes factory-flow { to { stroke-dashoffset: -14; } }
+.factory-line { animation: factory-flow 0.9s linear infinite; }
+@media (prefers-reduced-motion: reduce) { .factory-line { animation: none; } }

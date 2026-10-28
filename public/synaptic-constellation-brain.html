@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Synaptic Constellation Brain</title>
+<style>
+  html,body{margin:0;height:100%;overflow:hidden}
+  body{background:radial-gradient(ellipse 55% 60% at 6% 92%,#7a1fd433,transparent 70%),radial-gradient(ellipse 50% 55% at 96% 18%,#1fe07a2b,transparent 70%),#050505;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+  body.embed{background:transparent}
+  #stage{position:fixed;inset:0}
+  canvas{display:block;width:100%;height:100%;touch-action:pan-y;cursor:grab}
+  canvas:active{cursor:grabbing}
+  #hint,#dl{position:fixed;bottom:14px;font-size:12px;color:#ffffffaa}
+  #hint{left:50%;transform:translateX(-50%);pointer-events:none}
+  #dl{right:14px;background:#ffffff14;border:1px solid #ffffff33;border-radius:999px;padding:6px 14px;cursor:pointer;color:#fff;font:inherit;font-size:12px}
+  #dl:focus-visible{outline:2px solid #9b30ff;outline-offset:2px}
+  body.embed #hint,body.embed #dl{display:none}
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<div id="hint">Drag to rotate</div>
+<button id="dl" type="button">Download .glb</button>
+<!--
+  EMBED: <iframe src="synaptic-constellation-brain.html?embed" style="width:100%;height:520px;border:0" title="Synaptic constellation brain"></iframe>
+  "?embed" = transparent background, no hint, no download button.
+-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/GLTFExporter.js"></script>
+<script>
+/* ---------- brain-shaped constellation data (seeded, deterministic) ---------- */
+const SH={gap:6,rxLat:48,rxMed:.18,ry:36,rz:66},CXo=SH.gap/2+SH.rxMed*SH.rxLat;
+function rng(a){return()=>{a|=0;a=a+0x6d2b79f5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function unit(r){const g=()=>Math.sqrt(-2*Math.log(r()||1e-9))*Math.cos(6.283185*r());const x=g(),y=g(),z=g(),l=Math.hypot(x,y,z)||1;return[x/l,y/l,z/l]}
+function cerebrum(s,r){let u,med;do{u=unit(r);med=u[0]*s<0}while(med&&r()<.65);
+  const[ux,uy,uz]=u,sh=r()<.86?1:.35+.5*Math.cbrt(r()),
+  g=1+.07*Math.sin(6.1*ux+2.3*uz)*Math.cos(5.3*uy-1.7*ux)+.045*Math.sin(11*uz+3*uy),
+  tp=1-.18*Math.max(0,uz)-.1*Math.max(0,-uz);
+  return[s*CXo+ux*(med?SH.rxMed:1)*SH.rxLat*tp*g*sh,uy*SH.ry*(uy<0?.6:1)*g*sh,uz*SH.rz*g*sh]}
+function cerebellum(s,r){const[ux,uy,uz]=unit(r),g=1+.09*Math.sin(15*uy);return[s*17+ux*17*g,-26+uy*10*g,-50+uz*13*g]}
+function buildBrain(n,k,maxLen,longN,seed){
+  const r=rng(seed),pts=[],hem=[];
+  for(let i=0;i<n;i++){const s=i%2?1:-1;hem.push(s);pts.push(r()<.88?cerebrum(s,r):cerebellum(s,r))}
+  const d=(a,b)=>Math.hypot(pts[a][0]-pts[b][0],pts[a][1]-pts[b][1],pts[a][2]-pts[b][2]);
+  const E=new Set(),add=(a,b)=>E.add(a<b?a+'-'+b:b+'-'+a);
+  for(let a=0;a<n;a++){const c=[];for(let b=0;b<n;b++)if(b!==a&&hem[b]===hem[a])c.push([d(a,b),b]);
+    c.sort((p,q)=>p[0]-q[0]);c.slice(0,k).forEach((q,i)=>{if(i===0||q[0]<=maxLen)add(a,q[1])})}
+  for(let i=0;i<longN;i++){const a=Math.floor(r()*n),b=Math.floor(r()*n);if(a!==b&&hem[a]===hem[b]&&d(a,b)<40)add(a,b)}
+  const L=[],R=[];pts.forEach((p,i)=>{if(Math.abs(p[0])<CXo+6)(hem[i]<0?L:R).push(i)});
+  for(let i=0;i<18&&L.length&&R.length;i++){const a=L[Math.floor(r()*L.length)];let best=-1,bd=1e9;
+    for(const b of R){const x=d(a,b);if(x<bd){bd=x;best=b}}if(bd<22)add(a,best)}
+  return{pts,edges:[...E].map(e=>e.split('-').map(Number))};
+}
+
+(function(){
+/* ---------------- TWEAK HERE ---------------- */
+const NODES=900, K=4, MAX_LINK=22, LONG_LINKS=140, SEED=7;
+const NODE_RADIUS=0.5;      // pure white, unlit
+const LINK_OPACITY=0.3;     // hairline links
+const STOPS=[[0,'#a23bff'],[.35,'#5a60ff'],[.65,'#2fb0b0'],[1,'#2bff88']]; // purple -> blue -> teal -> green (left -> right)
+const SWAY=0.6;             // idle sway in radians (keeps purple on the left); 0 = off
+/* -------------------------------------------- */
+const stage=document.getElementById('stage'),dl=document.getElementById('dl');
+if(!window.THREE){stage.textContent='Could not load three.js. Check your connection.';return;}
+if(/[?&]embed/.test(location.search))document.body.classList.add('embed');
+if(!THREE.GLTFExporter)dl.hidden=true;
+let renderer;
+try{renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});}
+catch(e){stage.textContent='WebGL is not available in this browser.';return;}
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.outputEncoding=THREE.sRGBEncoding;           // no tone mapping, no bloom
+stage.appendChild(renderer.domElement);
+const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(32,1,1,2000);
+
+const {pts,edges}=buildBrain(NODES,K,MAX_LINK,LONG_LINKS,SEED);
+
+/* nodes: ONE merged mesh of tiny flat-white spheres */
+const tpl=new THREE.SphereGeometry(NODE_RADIUS,7,5),tp=tpl.attributes.position.array,tn=tpl.attributes.normal.array,ti=tpl.index.array;
+const nv=tp.length/3,P=new Float32Array(pts.length*tp.length),N=new Float32Array(pts.length*tp.length),I=new Uint32Array(pts.length*ti.length);
+pts.forEach((p,j)=>{
+  for(let v=0;v<nv;v++){const o=j*tp.length+v*3;P[o]=tp[v*3]+p[0];P[o+1]=tp[v*3+1]+p[1];P[o+2]=tp[v*3+2]+p[2];N[o]=tn[v*3];N[o+1]=tn[v*3+1];N[o+2]=tn[v*3+2];}
+  for(let t=0;t<ti.length;t++)I[j*ti.length+t]=ti[t]+j*nv;
+});
+const ng=new THREE.BufferGeometry();
+ng.setAttribute('position',new THREE.BufferAttribute(P,3));ng.setAttribute('normal',new THREE.BufferAttribute(N,3));ng.setIndex(new THREE.BufferAttribute(I,1));
+const nodeMesh=new THREE.Mesh(ng,new THREE.MeshBasicMaterial({color:0xffffff}));nodeMesh.name='Constellation_Nodes';
+
+/* links: hairline segments, colour = purple->green by x (so the gradient travels along each line) */
+const stops=STOPS.map(s=>[s[0],new THREE.Color(s[1])]),tmp=new THREE.Color();
+function colorAt(x){const t=Math.min(1,Math.max(0,(x+60)/120));let i=1;while(i<stops.length-1&&t>stops[i][0])i++;
+  const a=stops[i-1],b=stops[i];return tmp.copy(a[1]).lerp(b[1],(t-a[0])/(b[0]-a[0])).convertSRGBToLinear();}
+const LP=new Float32Array(edges.length*6),LC=new Float32Array(edges.length*6);
+edges.forEach((e,j)=>{e.forEach((id,s)=>{const p=pts[id],o=j*6+s*3,c=colorAt(p[0]);
+  LP[o]=p[0];LP[o+1]=p[1];LP[o+2]=p[2];LC[o]=c.r;LC[o+1]=c.g;LC[o+2]=c.b;});});
+const lg=new THREE.BufferGeometry();
+lg.setAttribute('position',new THREE.BufferAttribute(LP,3));lg.setAttribute('color',new THREE.BufferAttribute(LC,3));
+const links=new THREE.LineSegments(lg,new THREE.LineBasicMaterial({vertexColors:true,transparent:true,opacity:LINK_OPACITY,depthWrite:false}));
+links.name='Constellation_Links';
+
+const model=new THREE.Group();model.name='synaptic-constellation-brain';model.add(links,nodeMesh);
+const rig=new THREE.Group();rig.add(model);scene.add(rig);
+
+/* ---------- interaction: drag to rotate, gentle sway when idle ---------- */
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches,el=renderer.domElement;
+let yaw=0,pitch=0.5,vel=0,drag=false,lx=0,ly=0,idle=0;
+el.addEventListener('pointerdown',e=>{drag=true;lx=e.clientX;ly=e.clientY;el.setPointerCapture(e.pointerId);});
+el.addEventListener('pointermove',e=>{if(!drag)return;const dx=e.clientX-lx,dy=e.clientY-ly;lx=e.clientX;ly=e.clientY;
+  vel=dx*0.01;yaw+=vel;pitch=Math.max(-1.3,Math.min(1.3,pitch+dy*0.008));idle=0;});
+const up=()=>{drag=false;};el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up);
+function resize(){const w=stage.clientWidth||innerWidth,h=stage.clientHeight||innerHeight;
+  renderer.setSize(w,h,false);camera.aspect=w/h;const t=Math.tan(camera.fov*Math.PI/360)*2;
+  camera.position.set(0,0,Math.max(150/(t*camera.aspect),140/t));camera.updateProjectionMatrix();}
+if(window.ResizeObserver)new ResizeObserver(resize).observe(stage);addEventListener('resize',resize);resize();
+const clock=new THREE.Clock();
+(function tick(){requestAnimationFrame(tick);
+  const dt=Math.min(clock.getDelta(),0.05),t=clock.elapsedTime;
+  if(!drag){idle+=dt;
+    if(Math.abs(vel)>0.0005){yaw+=vel;vel*=0.95;}
+    else if(!reduce&&SWAY>0&&idle>1.5)yaw+=(Math.sin(t*0.25)*SWAY-yaw)*0.02;
+    pitch+=(0.5-pitch)*(idle>3?0.01:0);}
+  rig.rotation.y=yaw;rig.rotation.x=pitch;renderer.render(scene,camera);})();
+
+/* ---------- export as .glb ---------- */
+dl.addEventListener('click',()=>{if(!THREE.GLTFExporter)return;
+  new THREE.GLTFExporter().parse(model,res=>{const a=document.createElement('a');
+    a.href=URL.createObjectURL(new Blob([res],{type:'model/gltf-binary'}));a.download='synaptic-constellation-brain.glb';a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href),2000);},{binary:true});});
+})();
+</script>
+</body>
+</html>
