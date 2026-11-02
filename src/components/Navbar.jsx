@@ -4,7 +4,9 @@ import { Menu, X } from "lucide-react";
 
 const NAV_LINKS = [
   { id: "home", label: "Index" },
-  { id: "about", label: "About" },
+  { id: "architecture", label: "Arch" },
+  { id: "data", label: "Data" },
+  { id: "router", label: "PEP/PDP" },
   { id: "factory", label: "Factory" },
   { id: "projects", label: "Projects" },
   { id: "skills", label: "Stack" },

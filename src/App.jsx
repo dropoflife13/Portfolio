@@ -2,11 +2,13 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
-import About from "./components/About";
-import Process from "./components/Process";
+import ExplodedArchitecture from "./components/ExplodedArchitecture";
+import MinimalistData from "./components/MinimalistData";
+import PepPdpRouter from "./components/PepPdpRouter";
 import FactoryShowcase from "./components/FactoryShowcase";
 import Projects from "./components/Projects";
 import Skills from "./components/Skills";
+import About from "./components/About";
 import Contact from "./components/Contact";
 import Footer from "./components/Footer";
 import ScrollToTop from "./components/ScrollToTop";
@@ -68,11 +70,13 @@ function App() {
         transition={{ duration: 0.65, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
       >
         <Hero />
-        <About />
-        <Process />
+        <ExplodedArchitecture />
+        <MinimalistData />
+        <PepPdpRouter />
         <FactoryShowcase />
         <Projects />
         <Skills />
+        <About />
         <Contact />
       </motion.main>
 

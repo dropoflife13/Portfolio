@@ -211,23 +211,21 @@ export default function Hero() {
             <div>
               <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/25 bg-cyan-400/[0.07] px-3 py-1">
                 <Sparkles size={12} className="text-cyan-300" />
-                <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-cyan-200">
-                  Architecture · Systems · Craft
+                <span className="font-mono text-xs uppercase tracking-widest text-cyan-200">
+                  Architecture // Systems // Craft
                 </span>
               </div>
 
-              <h1 className="mt-5 text-[clamp(2rem,4vw,3.35rem)] font-light leading-[1.06] tracking-tight text-white">
+              <h1 className="mt-5 text-5xl sm:text-6xl md:text-7xl font-black tracking-tighter leading-[0.95] text-white">
                 I engineer software that{" "}
-                <span className="bg-gradient-to-r from-cyan-300 via-teal-200 to-sky-400 bg-clip-text font-normal italic text-transparent">
+                <span className="bg-gradient-to-r from-cyan-300 via-teal-200 to-sky-400 bg-clip-text font-black italic text-transparent">
                   feels finished.
                 </span>
               </h1>
 
-              <p className="mt-4 max-w-2xl text-sm leading-relaxed text-ink-muted sm:text-base">
-                I&apos;m Neil, a full-stack developer specializing in React,
-                Next.js, and system architecture. I care deeply about clean code
-                and human-centered design. To keep my workflow strict, I built a
-                custom 3D Knowledge Engine.
+              <p className="mt-4 max-w-xl font-mono text-xs uppercase tracking-wider text-ink-muted">
+                Full-stack developer building 3D knowledge engines and autonomous
+                multi-agent pipelines with React, Next.js, and Gemini.
               </p>
             </div>
 

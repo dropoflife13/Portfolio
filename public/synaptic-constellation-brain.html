@@ -17,10 +17,10 @@
   #dl:focus-visible{outline:2px solid #9b30ff;outline-offset:2px}
   body.embed #hint,body.embed #dl{display:none}
 
-  /* Sleek glassmorphic node tooltip */
+  /* Sleek glassmorphic node tooltip with smooth fade */
   #node-tooltip {
     position: absolute;
-    background: rgba(5,5,5,0.9);
+    background: rgba(5, 5, 5, 0.88);
     border: 1px solid #00FFFF;
     border-radius: 8px;
     padding: 8px 12px;
@@ -28,13 +28,20 @@
     font-family: monospace;
     font-size: 12px;
     pointer-events: none;
-    display: none;
+    opacity: 0;
+    visibility: hidden;
     z-index: 100;
-    box-shadow: 0 0 15px rgba(0,255,255,0.3);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    transition: opacity 0.2s;
+    box-shadow: 0 0 16px rgba(0, 255, 255, 0.35);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transition: opacity 0.25s ease, transform 0.15s ease;
     white-space: nowrap;
+    line-height: 1.4;
+    transform: translate(0, 0);
+  }
+  #node-tooltip.visible {
+    opacity: 1;
+    visibility: visible;
   }
 </style>
 </head>
@@ -71,7 +78,7 @@ function buildBrain(n,k,maxLen,longN,seed){
   const L=[],R=[];pts.forEach((p,i)=>{if(Math.abs(p[0])<CXo+6)(hem[i]<0?L:R).push(i)});
   for(let i=0;i<18&&L.length&&R.length;i++){const a=L[Math.floor(r()*L.length)];let best=-1,bd=1e9;
     for(const b of R){const x=d(a,b);if(x<bd){bd=x;best=b}}if(bd<22)add(a,best)}
-  return{pts,edges:[...E].map(e=>e.split('-').map(Number))};
+  return{pts,edges:[...E].map(e=>e.split('-').map(Number)),idMap:new Map()};
 }
 
 /* ---------- Live Cortex API fetch with 2s timeout fallback ---------- */
@@ -102,7 +109,7 @@ async function fetchBrainData(fallbackFn){
       });
     }
     console.info(`[Cortex] Connected to live API (${pts.length} nodes, ${edges.length} links).`);
-    return {pts,edges,live:true};
+    return {pts,edges,idMap,live:true};
   }catch(err){
     clearTimeout(timeoutId);
     console.warn('[Cortex] Live API fetch failed or timed out (2s). Gracefully falling back to static buildBrain().',err);
@@ -119,13 +126,13 @@ const STOPS=[[0,'#a23bff'],[.35,'#5a60ff'],[.65,'#2fb0b0'],[1,'#2bff88']]; // pu
 const SWAY=0.6;             // idle sway in radians (keeps purple on the left); 0 = off
 
 const agents = [
-  { name: 'Database Agent', file: 'dbaagent.md' },
-  { name: 'Security Agent', file: 'securityagent.md' },
-  { name: 'UI/UX Agent', file: 'uiuxagent.md' },
-  { name: 'Product Manager', file: 'productmanageragent.md' },
-  { name: 'Systems Design', file: 'systemsdesignagent.md' },
-  { name: 'Integration Agent', file: 'integrationagent.md' },
-  { name: 'Growth Agent', file: 'growthagent.md' }
+  { name: 'Database Agent', file: 'dbaagent.md', id: 'dbaagent' },
+  { name: 'Security Agent', file: 'securityagent.md', id: 'securityagent' },
+  { name: 'UI/UX Agent', file: 'uiuxagent.md', id: 'uiuxagent' },
+  { name: 'Product Manager', file: 'productmanageragent.md', id: 'productmanageragent' },
+  { name: 'Systems Design', file: 'systemsdesignagent.md', id: 'systemsdesignagent' },
+  { name: 'Integration Agent', file: 'integrationagent.md', id: 'integrationagent' },
+  { name: 'Growth Agent', file: 'growthagent.md', id: 'growthagent' }
 ];
 /* -------------------------------------------- */
 const stage=document.getElementById('stage'),dl=document.getElementById('dl'),tooltip=document.getElementById('node-tooltip');
@@ -136,11 +143,11 @@ let renderer;
 try{renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});}
 catch(e){stage.textContent='WebGL is not available in this browser.';return;}
 renderer.setPixelRatio(Math.min(devicePixelRatio,2));
-renderer.outputEncoding=THREE.sRGBEncoding;           // no tone mapping, no bloom
+renderer.outputEncoding=THREE.sRGBEncoding;
 stage.appendChild(renderer.domElement);
 const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(32,1,1,2000);
 
-const {pts,edges}=await fetchBrainData(()=>buildBrain(NODES,K,MAX_LINK,LONG_LINKS,SEED));
+const {pts,edges,idMap}=await fetchBrainData(()=>buildBrain(NODES,K,MAX_LINK,LONG_LINKS,SEED));
 
 /* nodes: ONE merged mesh of tiny flat-white spheres */
 const tpl=new THREE.SphereGeometry(NODE_RADIUS,7,5),tp=tpl.attributes.position.array,tn=tpl.attributes.normal.array,ti=tpl.index.array;
@@ -153,7 +160,7 @@ const ng=new THREE.BufferGeometry();
 ng.setAttribute('position',new THREE.BufferAttribute(P,3));ng.setAttribute('normal',new THREE.BufferAttribute(N,3));ng.setIndex(new THREE.BufferAttribute(I,1));
 const nodeMesh=new THREE.Mesh(ng,new THREE.MeshBasicMaterial({color:0xffffff}));nodeMesh.name='Constellation_Nodes';
 
-/* links: hairline segments, colour = purple->green by x (so the gradient travels along each line) */
+/* links: hairline segments, colour = purple->green by x */
 const stops=STOPS.map(s=>[s[0],new THREE.Color(s[1])]),tmp=new THREE.Color();
 function colorAt(x){const t=Math.min(1,Math.max(0,(x+60)/120));let i=1;while(i<stops.length-1&&t>stops[i][0])i++;
   const a=stops[i-1],b=stops[i];return tmp.copy(a[1]).lerp(b[1],(t-a[0])/(b[0]-a[0])).convertSRGBToLinear();}
@@ -167,32 +174,43 @@ links.name='Constellation_Links';
 
 const model=new THREE.Group();model.name='synaptic-constellation-brain';model.add(links,nodeMesh);
 
-/* ---------- Interactive 7 Agent Nodes (Beacons, Rings & Hit Proxies) ---------- */
+/* ---------- The 7 Core Agent Nodes (Beacons, Halo Rings & Invisible Hit Targets) ---------- */
 const agentMeshes=[];
 const agentHitObjects=[];
 const beaconGeom=new THREE.SphereGeometry(1.6,16,16);
-const hitGeom=new THREE.SphereGeometry(5.2,8,8);
-const hitMat=new THREE.MeshBasicMaterial({visible:false});
+const ringGeom=new THREE.RingGeometry(2.2,3.0,24);
+const hitGeom=new THREE.SphereGeometry(6.0,10,10);
+// Hit material: transparent with opacity 0 ensures raycaster intersects it while staying invisible
+const hitMat=new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false});
 
 agents.forEach((agent,i)=>{
-  if(!pts[i])return;
-  const p=pts[i];
+  // Find point from idMap if live data has matching ID, otherwise use first 7 points
+  let ptIndex=i;
+  if(idMap&&idMap.has(agent.id)){
+    ptIndex=idMap.get(agent.id);
+  }
+  if(!pts[ptIndex])return;
+  const p=pts[ptIndex];
   const pos=new THREE.Vector3(p[0],p[1],p[2]);
 
-  // Glowing beacon sphere
-  const beacon=new THREE.Mesh(beaconGeom,new THREE.MeshBasicMaterial({color:0x00ffff}));
+  // Visual glowing agent beacon
+  const beaconMat=new THREE.MeshBasicMaterial({color:0x00ffff});
+  const beacon=new THREE.Mesh(beaconGeom,beaconMat);
   beacon.position.copy(pos);
   model.add(beacon);
 
-  // Outer halo pulse ring
-  const ring=new THREE.Mesh(
-    new THREE.RingGeometry(2.2,2.9,24),
-    new THREE.MeshBasicMaterial({color:0x00ffff,side:THREE.DoubleSide,transparent:true,opacity:0.75})
-  );
+  // Outer pulse halo ring
+  const ringMat=new THREE.MeshBasicMaterial({
+    color:0x00ffff,
+    side:THREE.DoubleSide,
+    transparent:true,
+    opacity:0.75
+  });
+  const ring=new THREE.Mesh(ringGeom,ringMat);
   ring.position.copy(pos);
   model.add(ring);
 
-  // Invisible hit proxy for raycasting
+  // Raycastable hit mesh
   const hitMesh=new THREE.Mesh(hitGeom,hitMat);
   hitMesh.position.copy(pos);
   hitMesh.userData={agent,index:i,pos,beacon,ring};
@@ -204,79 +222,18 @@ agents.forEach((agent,i)=>{
 
 const rig=new THREE.Group();rig.add(model);scene.add(rig);
 
-/* ---------- Tooltip Rendering & Raycast Logic ---------- */
+/* ---------- Raycaster & Interaction State ---------- */
 const raycaster=new THREE.Raycaster();
-const mouse=new THREE.Vector2();
+const mouse=new THREE.Vector2(-9999,-9999);
 const tempV=new THREE.Vector3();
 let hoveredAgent=null,pinnedAgent=null;
+let mouseOnScreen=false,rawClientX=0,rawClientY=0;
+let lastRenderedAgent=null;
 
-function positionTooltip(agentItem){
-  if(!agentItem||!agentItem.pos)return;
-  tempV.copy(agentItem.pos).applyMatrix4(model.matrixWorld);
-  tempV.project(camera);
-  const w=stage.clientWidth||innerWidth,h=stage.clientHeight||innerHeight;
-  const sx=(tempV.x*0.5+0.5)*w,sy=(-tempV.y*0.5+0.5)*h;
-  if(tempV.z<1){
-    const left=Math.min(w-220,Math.max(10,sx+14));
-    const top=Math.min(h-60,Math.max(10,sy-20));
-    tooltip.style.left=left+'px';
-    tooltip.style.top=top+'px';
-    tooltip.style.display='block';
-    tooltip.style.opacity='1';
-  }else{
-    tooltip.style.display='none';
-  }
-}
-
-function renderTooltip(agentItem){
-  if(!agentItem){
-    if(!pinnedAgent){
-      tooltip.style.display='none';
-      tooltip.style.opacity='0';
-    }
-    return;
-  }
-  const agent=agentItem.agent;
-  tooltip.innerHTML=`<div style="font-weight:700;color:#00FFFF;margin-bottom:3px;display:flex;align-items:center;gap:6px;">
-    <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#00FFFF;box-shadow:0 0 8px #00FFFF;"></span>
-    ${agent.name}
-  </div>
-  <div style="color:#cbd5e1;font-size:11px;opacity:0.9;">
-    📄 ${agent.file}
-  </div>`;
-  tooltip.style.display='block';
-  tooltip.style.opacity='1';
-  positionTooltip(agentItem);
-}
-
-function checkIntersection(clientX,clientY){
-  const rect=renderer.domElement.getBoundingClientRect();
-  mouse.x=((clientX-rect.left)/rect.width)*2-1;
-  mouse.y=-((clientY-rect.top)/rect.height)*2+1;
-  raycaster.setFromCamera(mouse,camera);
-
-  // 1. Raycast against 3D hit targets
-  const intersects=raycaster.intersectObjects(agentHitObjects);
-  if(intersects.length>0)return intersects[0].object.userData;
-
-  // 2. Proximity fallback in 2D screen space (< 26px)
-  let closest=null,minDist=26;
-  agentMeshes.forEach(item=>{
-    tempV.copy(item.pos).applyMatrix4(model.matrixWorld);
-    tempV.project(camera);
-    if(tempV.z<1){
-      const sx=(tempV.x*0.5+0.5)*rect.width+rect.left;
-      const sy=(-tempV.y*0.5+0.5)*rect.height+rect.top;
-      const dist=Math.hypot(clientX-sx,clientY-sy);
-      if(dist<minDist){minDist=dist;closest=item;}
-    }
-  });
-  return closest;
-}
-
-/* ---------- interaction: drag to rotate, hover/click nodes, gentle sway when idle ---------- */
+/* ---------- Pointer Events (Track Mouse Position) ---------- */
 const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches,el=renderer.domElement;
 let yaw=0,pitch=0.5,vel=0,drag=false,lx=0,ly=0,idle=0,downX=0,downY=0;
+
 el.addEventListener('pointerdown',e=>{
   drag=true;
   lx=e.clientX;ly=e.clientY;
@@ -285,41 +242,35 @@ el.addEventListener('pointerdown',e=>{
 });
 
 el.addEventListener('pointermove',e=>{
+  mouseOnScreen=true;
+  rawClientX=e.clientX;
+  rawClientY=e.clientY;
+
+  const rect=el.getBoundingClientRect();
+  mouse.x=((e.clientX-rect.left)/rect.width)*2-1;
+  mouse.y=-((e.clientY-rect.top)/rect.height)*2+1;
+
   if(drag){
     const dx=e.clientX-lx,dy=e.clientY-ly;
     lx=e.clientX;ly=e.clientY;
     vel=dx*0.01;yaw+=vel;pitch=Math.max(-1.3,Math.min(1.3,pitch+dy*0.008));idle=0;
-    return;
   }
-  const hit=checkIntersection(e.clientX,e.clientY);
-  if(hit){
-    hoveredAgent=hit;
-    el.style.cursor='pointer';
-    renderTooltip(hit);
-  }else{
-    hoveredAgent=null;
-    el.style.cursor=drag?'grabbing':'grab';
-    if(!pinnedAgent){
-      tooltip.style.display='none';
-      tooltip.style.opacity='0';
-    }
-  }
+});
+
+el.addEventListener('pointerleave',()=>{
+  mouseOnScreen=false;
+  mouse.set(-9999,-9999);
 });
 
 const up=(e)=>{
   drag=false;
   const moved=Math.hypot(e.clientX-downX,e.clientY-downY);
   if(moved<6){
-    const hit=checkIntersection(e.clientX,e.clientY);
-    if(hit){
-      pinnedAgent=(pinnedAgent&&pinnedAgent.index===hit.index)?null:hit;
-      hoveredAgent=hit;
-      renderTooltip(hit);
+    // Click or tap on node
+    if(hoveredAgent){
+      pinnedAgent=(pinnedAgent&&pinnedAgent.index===hoveredAgent.index)?null:hoveredAgent;
     }else{
       pinnedAgent=null;
-      hoveredAgent=null;
-      tooltip.style.display='none';
-      tooltip.style.opacity='0';
     }
   }
 };
@@ -331,6 +282,7 @@ function resize(){const w=stage.clientWidth||innerWidth,h=stage.clientHeight||in
   camera.position.set(0,0,Math.max(150/(t*camera.aspect),140/t));camera.updateProjectionMatrix();}
 if(window.ResizeObserver)new ResizeObserver(resize).observe(stage);addEventListener('resize',resize);resize();
 
+/* ---------- Animation & Raycasting Tick Loop ---------- */
 const clock=new THREE.Clock();
 (function tick(){requestAnimationFrame(tick);
   const dt=Math.min(clock.getDelta(),0.05),t=clock.elapsedTime;
@@ -340,8 +292,36 @@ const clock=new THREE.Clock();
     pitch+=(0.5-pitch)*(idle>3?0.01:0);}
   rig.rotation.y=yaw;rig.rotation.x=pitch;
 
-  // Update halo orientation & pulsing
+  // Make sure model's world matrix is current for raycasting & projection
   model.updateMatrixWorld(true);
+
+  // 1. Raycast in the tick loop to detect if user is hovering over an agent node
+  if(!drag&&mouseOnScreen){
+    raycaster.setFromCamera(mouse,camera);
+    const intersects=raycaster.intersectObjects(agentHitObjects,false);
+    if(intersects.length>0){
+      hoveredAgent=intersects[0].object.userData;
+    }else{
+      // Proximity check in 2D screen space (< 28px) as a seamless fallback
+      let closest=null,minDist=28;
+      const rect=el.getBoundingClientRect();
+      agentMeshes.forEach(item=>{
+        tempV.copy(item.pos).applyMatrix4(model.matrixWorld);
+        tempV.project(camera);
+        if(tempV.z<1){
+          const sx=(tempV.x*0.5+0.5)*rect.width+rect.left;
+          const sy=(-tempV.y*0.5+0.5)*rect.height+rect.top;
+          const dist=Math.hypot(rawClientX-sx,rawClientY-sy);
+          if(dist<minDist){minDist=dist;closest=item;}
+        }
+      });
+      hoveredAgent=closest;
+    }
+  }else if(drag){
+    hoveredAgent=null;
+  }
+
+  // 2. Animate and billboard the core agent halo rings
   agentMeshes.forEach((item,idx)=>{
     item.ring.quaternion.copy(camera.quaternion);
     const isAct=(hoveredAgent&&hoveredAgent.index===idx)||(pinnedAgent&&pinnedAgent.index===idx);
@@ -350,8 +330,47 @@ const clock=new THREE.Clock();
     item.beacon.scale.setScalar(isAct?1.5:1);
   });
 
+  // 3. Move and update the tooltip if hovering or pinned
   const activeItem=hoveredAgent||pinnedAgent;
-  if(activeItem)positionTooltip(activeItem);
+  if(activeItem&&activeItem.pos){
+    tempV.copy(activeItem.pos).applyMatrix4(model.matrixWorld);
+    tempV.project(camera);
+    if(tempV.z<1){
+      const w=stage.clientWidth||innerWidth;
+      const h=stage.clientHeight||innerHeight;
+      const sx=(tempV.x*0.5+0.5)*w;
+      const sy=(-tempV.y*0.5+0.5)*h;
+
+      // Position tooltip right next to the node with boundary safety
+      const tooltipW=180;
+      const left=Math.min(w-tooltipW-16,Math.max(12,sx+16));
+      const top=Math.min(h-55,Math.max(12,sy-20));
+      tooltip.style.left=left+'px';
+      tooltip.style.top=top+'px';
+
+      // Update text to display Agent name and .md filename
+      if(lastRenderedAgent!==activeItem.agent.name){
+        tooltip.innerHTML=`<div style="font-weight:700;color:#00FFFF;margin-bottom:2px;display:flex;align-items:center;gap:6px;">
+          <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#00FFFF;box-shadow:0 0 8px #00FFFF;"></span>
+          ${activeItem.agent.name}
+        </div>
+        <div style="color:#94a3b8;font-size:11px;letter-spacing:0.02em;">
+          📄 ${activeItem.agent.file}
+        </div>`;
+        lastRenderedAgent=activeItem.agent.name;
+      }
+
+      tooltip.classList.add('visible');
+      el.style.cursor='pointer';
+    }else{
+      tooltip.classList.remove('visible');
+      el.style.cursor=drag?'grabbing':'grab';
+    }
+  }else{
+    tooltip.classList.remove('visible');
+    if(!drag)el.style.cursor='grab';
+    lastRenderedAgent=null;
+  }
 
   renderer.render(scene,camera);
 })();
