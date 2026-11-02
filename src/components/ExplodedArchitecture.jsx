@@ -100,7 +100,7 @@ export default function ExplodedArchitecture() {
         </div>
 
         {/* The Exploded Diagram */}
-        <div className="relative mt-16 rounded-3xl border border-white/10 bg-black/60 p-6 backdrop-blur-2xl sm:p-10 lg:p-14 dark:border-white/10 dark:bg-black/80">
+        <div className="relative mt-16 rounded-3xl border border-white/10 bg-white/[0.02] p-6 backdrop-blur-2xl shadow-[0_8px_32px_rgba(0,0,0,0.36)] sm:p-10 lg:p-14">
           {/* Subtle tech background grid */}
           <div
             aria-hidden="true"

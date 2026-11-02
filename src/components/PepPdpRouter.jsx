@@ -35,7 +35,7 @@ export default function PepPdpRouter() {
         </div>
 
         {/* The Flow Diagram Container */}
-        <div className="relative mt-16 rounded-3xl border border-white/10 bg-[#040814]/90 p-6 backdrop-blur-2xl sm:p-10 lg:p-12">
+        <div className="relative mt-16 rounded-3xl border border-white/10 bg-white/[0.02] p-6 backdrop-blur-2xl sm:p-10 lg:p-12 shadow-[0_8px_32px_rgba(0,0,0,0.36)]">
           {/* Subtle background tech grid */}
           <div
             aria-hidden="true"
@@ -50,7 +50,7 @@ export default function PepPdpRouter() {
           <div className="relative grid grid-cols-1 items-center gap-12 lg:grid-cols-12 lg:gap-6">
             {/* Box 1: User Query (PEP) */}
             <div className="lg:col-span-3">
-              <div className="group relative rounded-2xl border border-white/15 bg-black/60 p-5 backdrop-blur-xl transition-all duration-300 hover:border-cyan-400/50 hover:shadow-[0_0_30px_rgba(34,211,238,0.15)]">
+              <div className="group relative rounded-2xl border border-white/15 bg-white/[0.03] p-5 backdrop-blur-xl transition-all duration-300 hover:border-cyan-400/50 hover:shadow-[0_0_30px_rgba(34,211,238,0.15)]">
                 <div className="flex items-center justify-between border-b border-white/10 pb-3">
                   <div className="flex items-center gap-2">
                     <Terminal size={14} className="text-cyan-400" />
@@ -182,7 +182,7 @@ export default function PepPdpRouter() {
                 className={`w-full rounded-xl border p-3.5 text-left transition-all duration-200 ${
                   activeTier === 1
                     ? "border-emerald-400/60 bg-emerald-400/10 shadow-[0_0_20px_rgba(16,185,129,0.2)]"
-                    : "border-white/10 bg-black/40 hover:border-white/20"
+                    : "border-white/10 bg-white/[0.03] hover:border-white/20 hover:bg-white/[0.05]"
                 }`}
               >
                 <div className="flex items-center justify-between">
@@ -205,7 +205,7 @@ export default function PepPdpRouter() {
                 className={`w-full rounded-xl border p-3.5 text-left transition-all duration-200 ${
                   activeTier === 2
                     ? "border-cyan-400/60 bg-cyan-400/10 shadow-[0_0_20px_rgba(34,211,238,0.2)]"
-                    : "border-white/10 bg-black/40 hover:border-white/20"
+                    : "border-white/10 bg-white/[0.03] hover:border-white/20 hover:bg-white/[0.05]"
                 }`}
               >
                 <div className="flex items-center justify-between">
@@ -228,7 +228,7 @@ export default function PepPdpRouter() {
                 className={`w-full rounded-xl border p-3.5 text-left transition-all duration-200 ${
                   activeTier === 3
                     ? "border-purple-400/60 bg-purple-400/10 shadow-[0_0_20px_rgba(168,85,247,0.2)]"
-                    : "border-white/10 bg-black/40 hover:border-white/20"
+                    : "border-white/10 bg-white/[0.03] hover:border-white/20 hover:bg-white/[0.05]"
                 }`}
               >
                 <div className="flex items-center justify-between">

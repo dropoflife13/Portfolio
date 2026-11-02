@@ -2,7 +2,6 @@ import { TrendingDown, TrendingUp } from "lucide-react";
 import SectionLabel from "./SectionLabel";
 
 export default function MinimalistData() {
-
   // SVG dimensions for the minimal charts
   const width = 360;
   const height = 140;
@@ -34,7 +33,7 @@ export default function MinimalistData() {
   return (
     <section
       id="data"
-      className="relative overflow-hidden bg-black px-4 py-24 sm:px-6 sm:py-32 dark:bg-black"
+      className="relative overflow-hidden px-4 py-24 sm:px-6 sm:py-32"
     >
       <div className="mx-auto max-w-page">
         {/* Section Header */}
@@ -43,86 +42,90 @@ export default function MinimalistData() {
             <SectionLabel number={3} text="System Telemetry // Scale" />
             <h2 className="mt-4 text-4xl font-black tracking-tighter text-white sm:text-5xl md:text-6xl">
               Minimalist Data.{" "}
-              <span className="text-white/40">Zero noise.</span>
+              <span className="bg-gradient-to-r from-cyan-300 via-teal-200 to-sky-400 bg-clip-text text-transparent">
+                Zero noise.
+              </span>
             </h2>
           </div>
-          <p className="max-w-md font-mono text-xs uppercase tracking-widest text-white/50">
+          <p className="max-w-md font-mono text-xs uppercase tracking-widest text-slate-400/80">
             Real telemetry across token consumption, domain knowledge expansion,
             and deterministic gatekeeper throughput.
           </p>
         </div>
 
-        {/* High-Contrast Grid with Huge Typography */}
-        <div className="mt-12 grid grid-cols-1 divide-y divide-white/10 border-y border-white/10 md:grid-cols-2 md:divide-x md:divide-y-0 lg:grid-cols-4">
-          {/* Stat 1: 29 Domains */}
-          <div className="group p-8 transition-colors duration-300 hover:bg-white/[0.02] sm:p-10">
-            <span className="font-mono text-[11px] uppercase tracking-[0.25em] text-cyan-400">
-              01 // ONTOLOGY DEPTH
-            </span>
-            <div className="mt-4 text-6xl font-black tracking-tighter text-white sm:text-7xl lg:text-8xl">
-              29
+        {/* High-Contrast Glassmorphic Grid with Huge Typography */}
+        <div className="mt-12 overflow-hidden rounded-3xl border border-white/10 bg-white/[0.02] backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.36)]">
+          <div className="grid grid-cols-1 divide-y divide-white/10 md:grid-cols-2 md:divide-x md:divide-y-0 lg:grid-cols-4">
+            {/* Stat 1: 29 Domains */}
+            <div className="group p-8 transition-colors duration-300 hover:bg-white/[0.04] sm:p-10">
+              <span className="font-mono text-[11px] uppercase tracking-[0.25em] text-cyan-400">
+                01 // ONTOLOGY DEPTH
+              </span>
+              <div className="mt-4 text-6xl font-black tracking-tighter text-white sm:text-7xl lg:text-8xl">
+                29
+              </div>
+              <h3 className="mt-3 text-sm font-semibold tracking-wide text-white">
+                Autonomous Domains
+              </h3>
+              <p className="mt-1 font-mono text-xs text-slate-400/80">
+                Mapped into a unified 3D synaptic knowledge graph.
+              </p>
             </div>
-            <h3 className="mt-3 text-sm font-semibold tracking-wide text-white">
-              Autonomous Domains
-            </h3>
-            <p className="mt-1 font-mono text-xs text-white/45">
-              Mapped into a unified 3D synaptic knowledge graph.
-            </p>
-          </div>
 
-          {/* Stat 2: 200+ Rules */}
-          <div className="group p-8 transition-colors duration-300 hover:bg-white/[0.02] sm:p-10">
-            <span className="font-mono text-[11px] uppercase tracking-[0.25em] text-teal-400">
-              02 // INVARIANTS
-            </span>
-            <div className="mt-4 text-6xl font-black tracking-tighter text-white sm:text-7xl lg:text-8xl">
-              200+
+            {/* Stat 2: 200+ Rules */}
+            <div className="group p-8 transition-colors duration-300 hover:bg-white/[0.04] sm:p-10">
+              <span className="font-mono text-[11px] uppercase tracking-[0.25em] text-teal-400">
+                02 // INVARIANTS
+              </span>
+              <div className="mt-4 text-6xl font-black tracking-tighter text-white sm:text-7xl lg:text-8xl">
+                200+
+              </div>
+              <h3 className="mt-3 text-sm font-semibold tracking-wide text-white">
+                Deterministic Rules
+              </h3>
+              <p className="mt-1 font-mono text-xs text-slate-400/80">
+                Enforced STRIDE checks, RLS policies, and schema guards.
+              </p>
             </div>
-            <h3 className="mt-3 text-sm font-semibold tracking-wide text-white">
-              Deterministic Rules
-            </h3>
-            <p className="mt-1 font-mono text-xs text-white/45">
-              Enforced STRIDE checks, RLS policies, and schema guards.
-            </p>
-          </div>
 
-          {/* Stat 3: 80% Cost Reduction */}
-          <div className="group p-8 transition-colors duration-300 hover:bg-white/[0.02] sm:p-10">
-            <span className="font-mono text-[11px] uppercase tracking-[0.25em] text-emerald-400">
-              03 // EFFICIENCY
-            </span>
-            <div className="mt-4 text-6xl font-black tracking-tighter text-white sm:text-7xl lg:text-8xl">
-              80%
+            {/* Stat 3: 80% Cost Reduction */}
+            <div className="group p-8 transition-colors duration-300 hover:bg-white/[0.04] sm:p-10">
+              <span className="font-mono text-[11px] uppercase tracking-[0.25em] text-emerald-400">
+                03 // EFFICIENCY
+              </span>
+              <div className="mt-4 text-6xl font-black tracking-tighter text-white sm:text-7xl lg:text-8xl">
+                80%
+              </div>
+              <h3 className="mt-3 text-sm font-semibold tracking-wide text-white">
+                Token Cost Optimization
+              </h3>
+              <p className="mt-1 font-mono text-xs text-slate-400/80">
+                Local heuristic matching resolves queries before LLM calls.
+              </p>
             </div>
-            <h3 className="mt-3 text-sm font-semibold tracking-wide text-white">
-              Token Cost Optimization
-            </h3>
-            <p className="mt-1 font-mono text-xs text-white/45">
-              Local heuristic matching resolves queries before LLM calls.
-            </p>
-          </div>
 
-          {/* Stat 4: <5ms Latency */}
-          <div className="group p-8 transition-colors duration-300 hover:bg-white/[0.02] sm:p-10">
-            <span className="font-mono text-[11px] uppercase tracking-[0.25em] text-purple-400">
-              04 // LATENCY
-            </span>
-            <div className="mt-4 text-6xl font-black tracking-tighter text-white sm:text-7xl lg:text-8xl">
-              &lt;5ms
+            {/* Stat 4: <5ms Latency */}
+            <div className="group p-8 transition-colors duration-300 hover:bg-white/[0.04] sm:p-10">
+              <span className="font-mono text-[11px] uppercase tracking-[0.25em] text-purple-400">
+                04 // LATENCY
+              </span>
+              <div className="mt-4 text-6xl font-black tracking-tighter text-white sm:text-7xl lg:text-8xl">
+                &lt;5ms
+              </div>
+              <h3 className="mt-3 text-sm font-semibold tracking-wide text-white">
+                PDP Decision Speed
+              </h3>
+              <p className="mt-1 font-mono text-xs text-slate-400/80">
+                Instant policy interception without blocking production writes.
+              </p>
             </div>
-            <h3 className="mt-3 text-sm font-semibold tracking-wide text-white">
-              PDP Decision Speed
-            </h3>
-            <p className="mt-1 font-mono text-xs text-white/45">
-              Instant policy interception without blocking production writes.
-            </p>
           </div>
         </div>
 
         {/* Minimalist Ultra-Thin SVG Charts Section */}
-        <div className="mt-12 grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
           {/* Chart 1: Token Cost Optimization */}
-          <div className="group relative rounded-2xl border border-white/10 bg-[#060606] p-6 backdrop-blur-xl sm:p-8">
+          <div className="group relative rounded-3xl border border-white/10 bg-white/[0.02] p-6 backdrop-blur-xl transition-all duration-300 hover:border-emerald-400/30 sm:p-8 shadow-[0_8px_32px_rgba(0,0,0,0.36)]">
             <div className="flex items-center justify-between border-b border-white/[0.08] pb-4">
               <div className="flex items-center gap-3">
                 <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-emerald-400/30 bg-emerald-400/10 text-emerald-300">
@@ -202,7 +205,7 @@ export default function MinimalistData() {
           </div>
 
           {/* Chart 2: Knowledge Expansion */}
-          <div className="group relative rounded-2xl border border-white/10 bg-[#060606] p-6 backdrop-blur-xl sm:p-8">
+          <div className="group relative rounded-3xl border border-white/10 bg-white/[0.02] p-6 backdrop-blur-xl transition-all duration-300 hover:border-cyan-400/30 sm:p-8 shadow-[0_8px_32px_rgba(0,0,0,0.36)]">
             <div className="flex items-center justify-between border-b border-white/[0.08] pb-4">
               <div className="flex items-center gap-3">
                 <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-cyan-400/30 bg-cyan-400/10 text-cyan-300">
