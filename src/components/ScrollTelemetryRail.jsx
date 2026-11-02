@@ -69,7 +69,7 @@ export default function ScrollTelemetryRail() {
   return (
     <aside
       aria-label="Scroll Telemetry Rail"
-      className="fixed right-3.5 xl:right-6 top-1/2 -translate-y-1/2 z-40 hidden lg:flex flex-col items-end pointer-events-none select-none"
+      className="fixed right-3 xl:right-5 top-1/2 -translate-y-1/2 z-40 hidden xl:flex flex-col items-end pointer-events-none select-none"
     >
       <div className="pointer-events-auto flex flex-col items-end gap-3 group/rail p-2">
         {/* Top telemetry percentage HUD */}
@@ -107,14 +107,14 @@ export default function ScrollTelemetryRail() {
                   onMouseEnter={() => setHoveredId(sec.id)}
                   onMouseLeave={() => setHoveredId(null)}
                 >
-                  {/* Floating HUD Pill on Hover or Focus */}
-                  {(isHovered || (isActive && hoveredId === null)) && (
+                  {/* Floating HUD Pill on Hover only */}
+                  {isHovered && (
                     <motion.div
                       initial={{ opacity: 0, x: 8 }}
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: 8 }}
                       transition={{ duration: 0.15 }}
-                      className="absolute right-7 flex items-center gap-2 whitespace-nowrap rounded border border-white/10 bg-[#070d1f]/90 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider backdrop-blur-md shadow-[0_4px_20px_rgba(0,0,0,0.5)] pointer-events-none"
+                      className="absolute right-7 flex items-center gap-2 whitespace-nowrap rounded border border-white/10 bg-[#070d1f]/95 px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider backdrop-blur-md shadow-[0_4px_20px_rgba(0,0,0,0.6)] pointer-events-none z-50"
                     >
                       <span className="text-cyan-400 font-semibold">{sec.code}</span>
                       <span className="text-slate-200">{sec.label}</span>

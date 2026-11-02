@@ -28,8 +28,8 @@ export default function PepPdpRouter() {
               </span>
             </h2>
           </div>
-          <p className="max-w-md font-mono text-xs uppercase tracking-widest text-ink-muted">
-            Cerbos-inspired Policy Enforcement Point (PEP) and Policy Decision
+          <p className="max-w-md font-mono text-xs uppercase tracking-widest text-slate-400/80">
+            Deterministic Policy Enforcement Point (PEP) and Policy Decision
             Point (PDP) dispatching to 3 tiered execution engines.
           </p>
         </div>
@@ -65,7 +65,7 @@ export default function PepPdpRouter() {
                   <span className="font-mono text-[10px] uppercase tracking-widest text-cyan-300">
                     BOX 01 // INGRESS
                   </span>
-                  <h3 className="mt-1 text-xl font-bold text-white">
+                  <h3 className="mt-1 font-sans text-xl font-bold tracking-tight text-white">
                     User Query
                   </h3>
                   <p className="mt-1 font-mono text-xs text-white/50">
@@ -127,7 +127,7 @@ export default function PepPdpRouter() {
                     <span className="mt-2 block font-mono text-[10px] font-bold uppercase tracking-widest text-cyan-300">
                       PDP ENGINE
                     </span>
-                    <h3 className="text-sm font-bold tracking-tight text-white">
+                    <h3 className="font-sans text-sm font-bold tracking-tight text-white">
                       Tiered Router
                     </h3>
                     <p className="mt-1 font-mono text-[9px] text-white/50">
