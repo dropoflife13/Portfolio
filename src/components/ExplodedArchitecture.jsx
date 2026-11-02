@@ -6,8 +6,10 @@ import {
   Cpu,
   Terminal,
   Sparkles,
+  ArrowUpRight,
 } from "lucide-react";
 import SectionLabel from "./SectionLabel";
+import PixelBot from "./PixelBot";
 
 const LAYERS = [
   {
@@ -24,7 +26,7 @@ const LAYERS = [
       { name: "rls-policies.sql", desc: "Row-Level Constraints" },
       { name: "prd-invariants.json", desc: "Immutable Specs" },
     ],
-    metric: "159 Enforced Rules",
+    metric: "280+ Active Invariants",
   },
   {
     id: "domains",
@@ -216,15 +218,35 @@ export default function ExplodedArchitecture() {
                     )}
 
                     {layer.id === "domains" && (
-                      <div className="mt-4 flex flex-wrap gap-2">
-                        {layer.tags.map((tag) => (
-                          <span
-                            key={tag}
-                            className="rounded-lg border border-teal-400/20 bg-teal-400/10 px-2.5 py-1 font-mono text-[11px] text-teal-200"
-                          >
-                            #{tag}
-                          </span>
-                        ))}
+                      <div className="mt-4 space-y-4">
+                        {/* 8 Autonomous Pixel Bot Gatekeepers */}
+                        <div className="rounded-xl border border-teal-400/25 bg-black/40 p-3.5 backdrop-blur-md">
+                          <div className="mb-2.5 flex items-center justify-between">
+                            <span className="font-mono text-[10px] uppercase tracking-widest text-teal-300">
+                              Autonomous Governance Bots // Active Mesh
+                            </span>
+                            <span className="font-mono text-[10px] text-white/40">
+                              8 Agents Guarding 29 Shards
+                            </span>
+                          </div>
+                          <div className="grid grid-cols-4 sm:grid-cols-8 gap-2 items-center justify-items-center pt-1">
+                            {["DB", "SEC", "UX", "PM", "SD", "IR", "GR", "RS"].map((code) => (
+                              <PixelBot key={code} code={code} size={36} showNameTag={true} />
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Domain Taxonomy Tags */}
+                        <div className="flex flex-wrap gap-2">
+                          {layer.tags.map((tag) => (
+                            <span
+                              key={tag}
+                              className="rounded-lg border border-teal-400/20 bg-teal-400/10 px-2.5 py-1 font-mono text-[11px] text-teal-200"
+                            >
+                              #{tag}
+                            </span>
+                          ))}
+                        </div>
                       </div>
                     )}
 
@@ -290,16 +312,47 @@ export default function ExplodedArchitecture() {
                     CENTRAL ARBITER CORE
                   </span>
                   <h4 className="mt-2 font-sans text-lg font-bold text-white">
-                    Autonomous Governor
+                    Judgment Arbiter · Autonomous Governor
                   </h4>
-                  <p className="mt-1 max-w-[240px] font-mono text-xs text-ink-muted">
-                    Validates STRIDE boundaries &amp; schema invariants across
-                    all tiers.
+                  <p className="mt-1 max-w-[260px] font-mono text-xs text-slate-400/80">
+                    The Supreme Court of Cortex. Resolves cross-domain conflicts
+                    &amp; enforces 280+ active invariants across all tiers.
                   </p>
                 </div>
               </div>
             </div>
           </div>
+
+          {/* Pixel HQ Command Center Link Card */}
+          <a
+            href="https://cortex-gamma-ten.vercel.app/hq"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group relative mt-10 flex flex-col items-start justify-between gap-4 rounded-2xl border border-cyan-400/40 bg-gradient-to-r from-cyan-950/40 via-[#070e24] to-purple-950/30 p-5 backdrop-blur-xl transition-all duration-300 hover:border-cyan-400 hover:shadow-[0_0_35px_rgba(34,211,238,0.25)] sm:flex-row sm:items-center"
+          >
+            <div className="flex items-center gap-4">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-cyan-400/40 bg-cyan-400/10 text-cyan-300 shadow-[0_0_15px_rgba(34,211,238,0.3)]">
+                <Cpu className="h-6 w-6 animate-pulse" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="h-2 w-2 animate-ping rounded-full bg-cyan-400" />
+                  <span className="font-mono text-[10px] uppercase tracking-widest text-cyan-300">
+                    COMMAND CENTER ACCESS
+                  </span>
+                </div>
+                <h4 className="font-sans text-base font-bold text-white transition-colors group-hover:text-cyan-200">
+                  Enter the Pixel HQ ↗
+                </h4>
+                <p className="mt-0.5 font-mono text-xs text-slate-400">
+                  Watch the 8 autonomous agents manage the Cortex reactor in real-time.
+                </p>
+              </div>
+            </div>
+            <span className="inline-flex items-center gap-1.5 rounded-xl border border-cyan-400/40 bg-cyan-400/10 px-4 py-2 font-mono text-xs font-semibold text-cyan-200 transition-all group-hover:bg-cyan-400 group-hover:text-slate-950">
+              Launch HQ <ArrowUpRight size={14} />
+            </span>
+          </a>
         </div>
       </div>
     </section>

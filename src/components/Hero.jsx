@@ -185,13 +185,23 @@ export default function Hero() {
 
             {/* Required Caption Footer */}
             <div className="relative z-20 flex items-center justify-between gap-2 border-t border-white/[0.08] bg-black/60 px-4 py-3 backdrop-blur-md">
-              <p className="font-mono text-xs text-cyan-200/90">
+              <a
+                href="https://cortex-gamma-ten.vercel.app/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-mono text-xs text-cyan-200/90 transition-colors hover:text-cyan-100 hover:underline"
+              >
                 ↳ Live-connected to the Cortex API. Displaying real-time architecture.
-              </p>
-              <span className="hidden shrink-0 items-center gap-1.5 rounded border border-cyan-400/30 bg-cyan-400/10 px-2 py-0.5 font-mono text-[10px] text-cyan-300 sm:inline-flex">
+              </a>
+              <a
+                href="https://cortex-gamma-ten.vercel.app/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hidden shrink-0 items-center gap-1.5 rounded border border-cyan-400/40 bg-cyan-400/10 px-2.5 py-1 font-mono text-[10px] text-cyan-300 transition-all hover:border-cyan-400 hover:bg-cyan-400/20 sm:inline-flex"
+              >
                 <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-cyan-400" />
-                Live Stream
-              </span>
+                Live Stream ↗
+              </a>
             </div>
           </motion.div>
 
@@ -240,6 +250,16 @@ export default function Hero() {
                     size={15}
                     className="transition-transform duration-200 group-hover/btn:-translate-y-0.5 group-hover/btn:translate-x-0.5"
                   />
+                </a>
+
+                <a
+                  href="https://cortex-gamma-ten.vercel.app/hq"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-cyan-400/50 bg-gradient-to-r from-cyan-950/60 to-purple-950/40 px-3.5 py-2.5 font-mono text-xs font-medium text-cyan-200 shadow-[0_0_16px_rgba(34,211,238,0.2)] transition-all duration-200 hover:scale-105 hover:border-cyan-300 hover:bg-cyan-400/20 hover:text-white"
+                >
+                  <span className="h-1.5 w-1.5 animate-ping rounded-full bg-cyan-400" />
+                  Enter Pixel HQ ↗
                 </a>
 
                 <a
