@@ -13,6 +13,7 @@ import Contact from "./components/Contact";
 import Footer from "./components/Footer";
 import ScrollToTop from "./components/ScrollToTop";
 import ScrollProgress from "./components/ScrollProgress";
+import ScrollTelemetryRail from "./components/ScrollTelemetryRail";
 import CustomCursor from "./components/CustomCursor";
 import ParticleBackground from "./components/ParticleBackground";
 
@@ -33,6 +34,7 @@ function App() {
       <CustomCursor />
       <ParticleBackground />
       <ScrollProgress />
+      <ScrollTelemetryRail />
 
       {/* Quick "System Boot" Fade-In Overlay */}
       <AnimatePresence>
