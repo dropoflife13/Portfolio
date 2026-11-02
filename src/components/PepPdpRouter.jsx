@@ -110,34 +110,34 @@ export default function PepPdpRouter() {
 
             {/* Box 2: Tiered Router (PDP Diamond) */}
             <div className="flex flex-col items-center justify-center lg:col-span-4">
-              <div className="relative flex items-center justify-center">
+              <div className="relative flex h-64 w-64 items-center justify-center">
                 {/* Glowing Diamond Outline */}
                 <div
                   aria-hidden="true"
-                  className="pointer-events-none absolute h-52 w-52 rotate-45 rounded-2xl bg-cyan-500/10 blur-xl animate-pulse"
+                  className="pointer-events-none absolute h-44 w-44 rotate-45 rounded-2xl bg-cyan-500/15 blur-xl animate-pulse"
                 />
 
                 {/* Rotated Diamond Card */}
-                <div className="relative flex h-48 w-48 rotate-45 items-center justify-center rounded-2xl border-2 border-cyan-400/60 bg-gradient-to-br from-[#070e24] via-black to-[#070e24] shadow-[0_0_40px_rgba(34,211,238,0.3)] transition-transform duration-300 hover:scale-105">
+                <div className="relative flex h-40 w-40 rotate-45 items-center justify-center rounded-2xl border-2 border-cyan-400/60 bg-gradient-to-br from-[#070e24] via-black to-[#070e24] shadow-[0_0_40px_rgba(34,211,238,0.3)] transition-transform duration-300 hover:scale-105">
                   {/* Inside content rotated back so text stays horizontal */}
                   <div className="-rotate-45 p-3 text-center">
                     <div className="mx-auto flex h-8 w-8 items-center justify-center rounded-lg border border-cyan-400/40 bg-cyan-400/10 text-cyan-300">
-                      <Zap size={16} />
+                      <Zap size={15} />
                     </div>
-                    <span className="mt-2 block font-mono text-[10px] font-bold uppercase tracking-widest text-cyan-300">
+                    <span className="mt-1.5 block font-mono text-[10px] font-bold uppercase tracking-widest text-cyan-300">
                       PDP ENGINE
                     </span>
                     <h3 className="font-sans text-sm font-bold tracking-tight text-white">
                       Tiered Router
                     </h3>
-                    <p className="mt-1 font-mono text-[9px] text-white/50">
+                    <p className="mt-0.5 font-mono text-[9px] text-white/50">
                       Cost &amp; Risk Policy Matrix
                     </p>
                   </div>
                 </div>
               </div>
 
-              <span className="mt-6 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 font-mono text-[10px] uppercase tracking-widest text-white/60">
+              <span className="mt-4 rounded-full border border-white/10 bg-white/[0.03] px-3.5 py-1 font-mono text-[10px] uppercase tracking-widest text-white/70">
                 BOX 02 // POLICY DECISION POINT
               </span>
             </div>
