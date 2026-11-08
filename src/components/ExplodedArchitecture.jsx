@@ -36,20 +36,6 @@ const LAYERS = [
     icon: Database,
     accent: "#2dd4bf",
     glow: "rgba(45, 212, 191, 0.25)",
-    tags: [
-      "Auth & Identity",
-      "Append-Only DB",
-      "STRIDE Invariants",
-      "Row-Level Security",
-      "Next.js App Router",
-      "Three.js / WebGL",
-      "State Machines",
-      "CQRS & Replicas",
-      "Idempotent Queues",
-      "Zero-Trust Boundaries",
-      "Offline-First Sync",
-      "Telemetry & Tracing",
-    ],
     metric: "29 Domain Ontologies",
   },
 ];
@@ -198,7 +184,7 @@ export default function ExplodedArchitecture() {
                     )}
 
                     {layer.id === "domains" && (
-                      <div className="mt-4 space-y-4">
+                      <div className="mt-4">
                         {/* 8 Autonomous Pixel Bot Gatekeepers */}
                         <div className="rounded-xl border border-teal-400/25 bg-black/40 p-3.5 backdrop-blur-md">
                           <div className="mb-2.5 flex items-center justify-between">
@@ -211,21 +197,9 @@ export default function ExplodedArchitecture() {
                           </div>
                           <div className="grid grid-cols-4 sm:grid-cols-8 gap-2 items-center justify-items-center pt-1">
                             {["DB", "SEC", "UX", "PM", "SD", "IR", "GR", "RS"].map((code) => (
-                              <PixelBot key={code} code={code} size={36} showNameTag={false} />
+                              <PixelBot key={code} code={code} size={36} showNameTag={true} />
                             ))}
                           </div>
-                        </div>
-
-                        {/* Domain Taxonomy Tags */}
-                        <div className="flex flex-wrap gap-2">
-                          {layer.tags.map((tag) => (
-                            <span
-                              key={tag}
-                              className="rounded-lg border border-teal-400/20 bg-teal-400/10 px-2.5 py-1 font-mono text-[11px] text-teal-200"
-                            >
-                              #{tag}
-                            </span>
-                          ))}
                         </div>
                       </div>
                     )}
