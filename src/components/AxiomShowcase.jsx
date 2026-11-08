@@ -9,6 +9,7 @@ import {
   Zap,
 } from "lucide-react";
 import SectionLabel from "./SectionLabel";
+import fallbackAxiomData from "../data/axiom-portfolio-summary.json";
 
 const STAGES = [
   { name: "GENERATE", color: "#a855f7" },
@@ -19,14 +20,14 @@ const STAGES = [
   { name: "PASS", color: "#34d399" },
 ];
 
-const CONDITIONS = [
-  { name: "A", label: "Baseline (Zero Hint)", count: 120 },
-  { name: "B", label: "Canonical Fact Hints", count: 120 },
-  { name: "C", label: "Top-k Retrieved Lessons", count: 120 },
-  { name: "C0", label: "Verbatim Oracle Facts", count: 120 },
-  { name: "D", label: "Irrelevant PG Placebo", count: 120 },
-  { name: "E_B", label: "Zero-Tier 0 Null Check", count: 120 },
-];
+const CONDITION_LABELS = {
+  A: "Baseline (Zero Hint)",
+  B: "Canonical Fact Hints",
+  C: "Top-k Retrieved Lessons",
+  C0: "Verbatim Oracle Facts",
+  D: "Irrelevant PG Placebo",
+  E_B: "Zero-Tier 0 Null Check",
+};
 
 const TERMINAL_LOGS = [
   { time: "14:52:48", sys: "MEMORY", text: "Retrieved 10 lessons for C0/H-120", status: "OK" },
@@ -41,11 +42,37 @@ const TERMINAL_LOGS = [
 
 export default function AxiomShowcase() {
   const shouldReduceMotion = useReducedMotion();
+  const [axiomData, setAxiomData] = useState(fallbackAxiomData);
+  const [isLiveApi, setIsLiveApi] = useState(false);
   const [stageIndex, setStageIndex] = useState(5); // default PASS
   const [copied, setCopied] = useState(false);
   const [eqLevels, setEqLevels] = useState([
     45, 68, 85, 92, 60, 75, 88, 52, 70, 95, 62, 40, 80, 58, 48, 72,
   ]);
+
+  // Attempt to pull live data from Axiom local dashboard API (port 3000)
+  useEffect(() => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 1200);
+
+    fetch("http://localhost:3000/api/portfolio", { signal: controller.signal })
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+      })
+      .then((liveData) => {
+        if (liveData?.metrics && liveData?.project) {
+          setAxiomData(liveData);
+          setIsLiveApi(true);
+        }
+      })
+      .catch(() => {
+        // Axiom dev server offline; smoothly retaining static verified snapshot
+        setIsLiveApi(false);
+      });
+
+    return () => clearTimeout(timeoutId);
+  }, []);
 
   // Stage ticker animation loop
   useEffect(() => {
@@ -70,17 +97,19 @@ export default function AxiomShowcase() {
     return () => clearInterval(interval);
   }, [shouldReduceMotion]);
 
-  // Generate 720 deterministic cells for the evidence matrix
+  // Generate 720 deterministic cells for the evidence matrix matching actual pass rate
   const matrixCells = useMemo(() => {
-    return Array.from({ length: 720 }, (_, i) => {
+    const passedTarget = axiomData?.metrics?.passed ?? 288;
+    const totalTarget = axiomData?.metrics?.totalTrials ?? 720;
+    const passThreshold = totalTarget > 0 ? passedTarget / totalTarget : 0.4;
+    return Array.from({ length: totalTarget }, (_, i) => {
       const row = Math.floor(i / 60);
       const col = i % 60;
       const seed = Math.sin((col + 1) * 12.9898 + (row + 1) * 78.233) * 43758.5453;
       const rand = seed - Math.floor(seed);
-      // Roughly 75% pass (cyan), 25% fail (magenta)
-      return rand > 0.25 ? "pass" : "fail";
+      return rand < passThreshold ? "pass" : "fail";
     });
-  }, []);
+  }, [axiomData?.metrics?.passed, axiomData?.metrics?.totalTrials]);
 
   const handleCopyLogs = () => {
     const text = TERMINAL_LOGS.map(
@@ -136,7 +165,10 @@ export default function AxiomShowcase() {
                 <ShieldAlert size={15} />
               </div>
               <div className="font-mono text-xs font-bold tracking-widest text-white">
-                AXIOM <span className="font-normal text-slate-400/80 font-mono text-[11px]">Verifier / ablation v2</span>
+                AXIOM{" "}
+                <span className="font-normal text-slate-400/80 font-mono text-[11px]">
+                  Verifier / {axiomData?.project?.stage || "ablation v2"}
+                </span>
               </div>
             </div>
 
@@ -151,7 +183,9 @@ export default function AxiomShowcase() {
               </div>
               <div>
                 <span className="text-slate-500">CONDITIONS </span>
-                <b className="text-white">06</b>
+                <b className="text-white">
+                  {String(axiomData?.conditions?.length || 6).padStart(2, "0")}
+                </b>
               </div>
               <div>
                 <span className="text-slate-500">STAGE </span>
@@ -162,10 +196,17 @@ export default function AxiomShowcase() {
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/40 bg-emerald-400/10 px-3 py-1 font-mono text-[10px] uppercase tracking-wider text-emerald-300 shadow-[0_0_12px_rgba(52,211,153,0.25)]">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                ORACLE LIVE
-              </span>
+              {isLiveApi ? (
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/50 bg-emerald-400/15 px-3 py-1 font-mono text-[10px] uppercase tracking-wider text-emerald-300 shadow-[0_0_12px_rgba(52,211,153,0.35)]">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-ping" />
+                  LIVE LOCAL API (PORT 3000)
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-cyan-400/40 bg-cyan-400/10 px-3 py-1 font-mono text-[10px] uppercase tracking-wider text-cyan-300 shadow-[0_0_12px_rgba(34,211,238,0.25)]">
+                  <span className="h-1.5 w-1.5 rounded-full bg-cyan-400" />
+                  ORACLE SNAPSHOT · {axiomData?.project?.status || "COMPLETED"}
+                </span>
+              )}
             </div>
           </div>
 
@@ -251,32 +292,63 @@ export default function AxiomShowcase() {
                     RUN COMPLETION
                   </span>
                   <span className="font-mono text-[10px] text-emerald-400 font-semibold">
-                    100% COMPLETE
+                    {Math.round(
+                      ((axiomData?.metrics?.completedTrials || 720) /
+                        (axiomData?.metrics?.totalTrials || 720)) *
+                        100
+                    )}% COMPLETE
                   </span>
                 </div>
                 <div className="mt-2 flex items-baseline gap-2">
                   <span className="font-mono text-4xl sm:text-5xl font-black tracking-tight text-white">
-                    720
+                    {axiomData?.metrics?.completedTrials || 720}
                   </span>
-                  <span className="font-mono text-lg text-slate-500">/ 720</span>
+                  <span className="font-mono text-lg text-slate-500">
+                    / {axiomData?.metrics?.totalTrials || 720}
+                  </span>
                 </div>
                 <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
-                  <div className="h-full w-full bg-gradient-to-r from-purple-500 via-cyan-400 to-emerald-400 shadow-[0_0_12px_#22d3ee]" />
+                  <div
+                    style={{
+                      width: `${Math.min(
+                        100,
+                        Math.round(
+                          ((axiomData?.metrics?.completedTrials || 720) /
+                            (axiomData?.metrics?.totalTrials || 720)) *
+                            100
+                        )
+                      )}%`,
+                    }}
+                    className="h-full bg-gradient-to-r from-purple-500 via-cyan-400 to-emerald-400 shadow-[0_0_12px_#22d3ee]"
+                  />
                 </div>
                 <p className="mt-2 font-mono text-[10px] text-slate-400">
-                  1,692,794 tokens · 0 trials remain in the field
+                  {(axiomData?.metrics?.totalTokens || 1692794).toLocaleString()}{" "}
+                  tokens ·{" "}
+                  {Math.max(
+                    0,
+                    (axiomData?.metrics?.totalTrials || 720) -
+                      (axiomData?.metrics?.completedTrials || 720)
+                  )}{" "}
+                  trials remain in the field
                 </p>
               </div>
 
               {/* 6 Conditions Mini Breakdown */}
               <div className="grid grid-cols-2 gap-2 text-[10px] font-mono">
-                {CONDITIONS.map((c) => (
+                {(axiomData?.conditions || []).map((c) => (
                   <div
-                    key={c.name}
+                    key={c.condition}
                     className="flex items-center justify-between rounded-lg border border-white/5 bg-white/[0.02] px-2.5 py-1.5"
+                    title={`${c.condition}: ${CONDITION_LABELS[c.condition] || c.condition} · ${c.passed}/${c.total} passed (${c.passRate})`}
                   >
-                    <span className="text-cyan-300 font-bold">{c.name}</span>
-                    <span className="text-slate-400">{c.count}/120</span>
+                    <span className="text-cyan-300 font-bold">{c.condition}</span>
+                    <span className="text-slate-400">
+                      {c.passed}/{c.total}{" "}
+                      <span className="text-emerald-400/90 text-[9px]">
+                        ({c.passRate})
+                      </span>
+                    </span>
                   </div>
                 ))}
               </div>
@@ -412,9 +484,11 @@ export default function AxiomShowcase() {
             <div className="rounded-2xl border border-white/10 bg-black/40 p-4 font-mono backdrop-blur-xl lg:col-span-5">
               <div className="flex items-center justify-between border-b border-white/[0.08] pb-2">
                 <span className="text-[10px] tracking-widest text-slate-400">
-                  EVIDENCE MATRIX // 720 TRIALS
+                  EVIDENCE MATRIX // {axiomData?.metrics?.totalTrials || 720} TRIALS
                 </span>
-                <span className="text-xs font-bold text-white">720 SCORINGS</span>
+                <span className="text-xs font-bold text-white">
+                  {axiomData?.metrics?.totalTrials || 720} SCORINGS
+                </span>
               </div>
 
               {/* The 720-Cell Matrix Grid */}
@@ -434,16 +508,25 @@ export default function AxiomShowcase() {
               <div className="mt-2.5 flex items-center justify-between text-[10px] text-slate-400">
                 <div className="flex items-center gap-3">
                   <span className="inline-flex items-center gap-1">
-                    <span className="h-1.5 w-1.5 rounded-full bg-cyan-400" /> PASS 584
+                    <span className="h-1.5 w-1.5 rounded-full bg-cyan-400" /> PASS{" "}
+                    {axiomData?.metrics?.passed || 288}
                   </span>
                   <span className="inline-flex items-center gap-1">
-                    <span className="h-1.5 w-1.5 rounded-full bg-fuchsia-500" /> FAIL 136
+                    <span className="h-1.5 w-1.5 rounded-full bg-fuchsia-500" /> FAIL{" "}
+                    {axiomData?.metrics?.failed || 432}
                   </span>
                   <span className="inline-flex items-center gap-1">
-                    <span className="h-1.5 w-1.5 rounded-full bg-zinc-600" /> PENDING 0
+                    <span className="h-1.5 w-1.5 rounded-full bg-zinc-600" /> PENDING{" "}
+                    {Math.max(
+                      0,
+                      (axiomData?.metrics?.totalTrials || 720) -
+                        (axiomData?.metrics?.completedTrials || 720)
+                    )}
                   </span>
                 </div>
-                <span className="text-emerald-400 font-bold">81.1% ACC</span>
+                <span className="text-emerald-400 font-bold">
+                  {axiomData?.metrics?.passRate || "40.0%"} PASS
+                </span>
               </div>
             </div>
 
@@ -488,7 +571,9 @@ export default function AxiomShowcase() {
                 <span className="text-[10px] tracking-widest text-slate-400">
                   SYSTEM CONVERGENCE
                 </span>
-                <span className="text-[10px] text-cyan-300 font-bold">CONVERGING</span>
+                <span className="text-[10px] text-cyan-300 font-bold">
+                  {axiomData?.project?.status === "COMPLETED" ? "CONVERGED" : "CONVERGING"}
+                </span>
               </div>
 
               {/* Radial Gauge SVG */}
@@ -507,7 +592,10 @@ export default function AxiomShowcase() {
                     stroke="url(#gauge-grad)"
                     strokeWidth="8"
                     strokeDasharray="188.5"
-                    strokeDashoffset="50.9" // 73%
+                    strokeDashoffset={(
+                      188.5 *
+                      (1 - (axiomData?.metrics?.convergence ?? 0.73))
+                    ).toFixed(1)}
                     strokeLinecap="round"
                     className="shadow-lg"
                   />
@@ -525,13 +613,15 @@ export default function AxiomShowcase() {
                     textAnchor="middle"
                     className="font-mono text-2xl font-bold fill-white"
                   >
-                    73%
+                    {Math.round((axiomData?.metrics?.convergence ?? 0.73) * 100)}%
                   </text>
                 </svg>
               </div>
 
               <p className="mt-1 font-mono text-[9px] text-slate-500">
-                mean boundFactFraction · 720/720
+                mean boundFactFraction ·{" "}
+                {axiomData?.metrics?.completedTrials || 720}/
+                {axiomData?.metrics?.totalTrials || 720}
               </p>
             </div>
           </div>
