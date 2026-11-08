@@ -52,26 +52,6 @@ const LAYERS = [
     ],
     metric: "29 Domain Ontologies",
   },
-  {
-    id: "agents",
-    name: "The 8 Agents & Arbiter",
-    tagline: "Autonomous Verification Pipeline",
-    badge: "LAYER 03 // RUNTIME",
-    icon: Cpu,
-    accent: "#a855f7",
-    glow: "rgba(168, 85, 247, 0.25)",
-    agentsList: [
-      { code: "PM", role: "Product", desc: "Problem Interrogation" },
-      { code: "SD", role: "Systems", desc: "TRD & Failure Modes" },
-      { code: "UX", role: "Frontend", desc: "Accessible Systems" },
-      { code: "DB", role: "Database", desc: "Append-Only RLS" },
-      { code: "IR", role: "Reliability", desc: "Queues & Outboxes" },
-      { code: "SEC", role: "Security", desc: "STRIDE Auditor" },
-      { code: "GR", role: "Growth", desc: "Value Proposition" },
-      { code: "ARB", role: "Arbiter", desc: "Final Gatekeeper" },
-    ],
-    metric: "8 Specialized Gatekeepers",
-  },
 ];
 
 export default function ExplodedArchitecture() {
@@ -96,7 +76,7 @@ export default function ExplodedArchitecture() {
             </h2>
           </div>
           <p className="max-w-md font-mono text-xs uppercase tracking-widest text-ink-muted">
-            Three stacked cognitive layers wired into a central deterministic
+            Stacked cognitive layers wired into a central deterministic
             verification core. Hover each layer to inspect.
           </p>
         </div>
@@ -231,7 +211,7 @@ export default function ExplodedArchitecture() {
                           </div>
                           <div className="grid grid-cols-4 sm:grid-cols-8 gap-2 items-center justify-items-center pt-1">
                             {["DB", "SEC", "UX", "PM", "SD", "IR", "GR", "RS"].map((code) => (
-                              <PixelBot key={code} code={code} size={36} showNameTag={true} />
+                              <PixelBot key={code} code={code} size={36} showNameTag={false} />
                             ))}
                           </div>
                         </div>
@@ -247,29 +227,6 @@ export default function ExplodedArchitecture() {
                             </span>
                           ))}
                         </div>
-                      </div>
-                    )}
-
-                    {layer.id === "agents" && (
-                      <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
-                        {layer.agentsList.map((agent) => (
-                          <div
-                            key={agent.code}
-                            className="rounded-xl border border-purple-400/20 bg-purple-400/[0.08] p-2.5 font-mono text-xs"
-                          >
-                            <div className="flex items-center justify-between">
-                              <span className="font-bold text-purple-300">
-                                {agent.code}
-                              </span>
-                              <span className="text-[10px] text-white/40">
-                                {agent.role}
-                              </span>
-                            </div>
-                            <p className="mt-1 line-clamp-1 text-[10px] text-white/60">
-                              {agent.desc}
-                            </p>
-                          </div>
-                        ))}
                       </div>
                     )}
                   </motion.div>
