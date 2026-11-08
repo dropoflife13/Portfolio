@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
+import AxiomShowcase from "./components/AxiomShowcase";
 import ExplodedArchitecture from "./components/ExplodedArchitecture";
 import MinimalistData from "./components/MinimalistData";
 import PepPdpRouter from "./components/PepPdpRouter";
@@ -72,6 +73,7 @@ function App() {
         transition={{ duration: 0.65, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
       >
         <Hero />
+        <AxiomShowcase />
         <ExplodedArchitecture />
         <MinimalistData />
         <PepPdpRouter />

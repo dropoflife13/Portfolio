@@ -20,7 +20,7 @@ export default function PepPdpRouter() {
         {/* Section Header */}
         <div className="flex flex-col items-start justify-between gap-4 border-b border-white/10 pb-8 sm:flex-row sm:items-end">
           <div>
-            <SectionLabel number={4} text="Policy Engine // PEP & PDP Router" />
+            <SectionLabel number={5} text="Policy Engine // PEP & PDP Router" />
             <h2 className="mt-4 text-4xl font-black tracking-tighter text-white sm:text-5xl md:text-6xl">
               Zero-Trust Routing.{" "}
               <span className="bg-gradient-to-r from-cyan-300 via-teal-200 to-sky-400 bg-clip-text text-transparent">

@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Axiom · Healing Loop</title>
+<style>
+:root{--bg:#05060a;--fg:#e8eaf2;--dim:#7c819a;--line:rgba(160,170,255,.14);color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:var(--bg);color:var(--fg);font:12px/1.45 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;overflow:hidden}
+body.embed-canvas{background:transparent !important}
+body.embed-canvas .hud, body.embed-canvas .grid{display:none !important}
+main{position:relative;height:100%;overflow:hidden}
+.grid{position:absolute;inset:0;background:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:48px 48px;-webkit-mask-image:radial-gradient(ellipse at center,#000 25%,transparent 78%);mask-image:radial-gradient(ellipse at center,#000 25%,transparent 78%)}
+canvas{position:absolute;inset:0;width:100%;height:100%;cursor:grab;touch-action:none}
+.hud{position:absolute;inset:0;pointer-events:none}
+.hud>*{position:absolute}
+header{top:16px;left:24px;right:24px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding-bottom:12px}
+.brand b{letter-spacing:.2em;font-size:14px}.brand span{color:var(--dim);margin-left:10px}
+.m{display:flex;gap:22px;color:var(--dim)}.m b{display:block;color:var(--fg);font-weight:500}
+.chip{color:#34d399;border:1px solid rgba(52,211,153,.4);padding:3px 10px;border-radius:99px;letter-spacing:.08em}
+.hero{left:24px;top:22%;max-width:min(560px,60vw)}
+.k{color:#a78bfa;letter-spacing:.2em;margin:0 0 12px}
+h1{font:600 clamp(40px,7vw,92px)/.95 system-ui,sans-serif;letter-spacing:-.04em;margin:0 0 16px;text-shadow:0 0 40px rgba(168,85,247,.45)}
+.s{color:var(--dim);max-width:380px;margin:0}
+.conds{right:24px;top:84px;width:230px}
+.row{display:grid;grid-template-columns:34px 1fr 52px;gap:8px;align-items:center;margin-bottom:7px;color:var(--dim)}
+.bar{height:3px;background:var(--line)}.bar i{display:block;height:100%;width:0;background:#a855f7;box-shadow:0 0 8px #a855f7}
+.run{right:24px;bottom:120px;text-align:right}
+.big b{font-size:clamp(48px,6vw,84px);font-weight:600;letter-spacing:-.04em}.big span{color:var(--dim);font-size:18px}
+button{pointer-events:auto;background:none;color:var(--fg);border:1px solid var(--line);padding:6px 14px;font:inherit;letter-spacing:.12em;cursor:pointer}
+button:hover,button:focus-visible{border-color:#a78bfa;outline:none}
+footer{left:24px;bottom:18px;right:24px;border-top:1px solid var(--line);padding-top:10px;display:flex;gap:24px;align-items:flex-end;justify-content:space-between}
+#stages{display:flex;gap:8px;flex-wrap:wrap}#stages span{padding:2px 8px;border:1px solid var(--line);color:var(--dim)}
+#log{margin:0;color:var(--dim);min-width:0;max-width:46%;white-space:pre;overflow:hidden;text-align:right}
+.hint{left:50%;bottom:62px;transform:translateX(-50%);color:var(--dim);letter-spacing:.2em}
+@media(max-width:760px){.conds,#log,.m{display:none}.hero{top:16%}.run{bottom:100px}.hint{display:none}}
+</style></head><body>
+<main>
+<div class="grid"></div><canvas id="c" aria-label="Interactive 3D healing loop. Drag to orbit."></canvas>
+<div class="hud">
+<header><div class="brand"><b>AXIOM</b><span>Verifier / ablation v2</span></div>
+<div class="m"><div>ORACLE<b>locked</b></div><div>TEMP<b>0</b></div><div>CONDITIONS<b>06</b></div><div>STAGE<b id="stg">GENERATE</b></div></div>
+<div class="chip">SIMULATED STREAM</div></header>
+<section class="hero"><p class="k">● HEALING LOOP</p><h1>Architecture<br>under pressure.</h1><p class="s">Generate, verify, fail, advise, retry. Axiom tests generated migrations against the rules they claim to satisfy.</p></section>
+<aside class="conds" id="conds"></aside>
+<section class="run"><p class="k">RUN COMPLETION</p><div class="big"><b id="done">0</b><span> / 720</span></div><p id="rem" style="color:var(--dim)">720 trials remain in the field</p><button id="tg">PAUSE</button></section>
+<div class="hint">DRAG TO ORBIT · SCROLL TO ZOOM</div>
+<footer><div id="stages"></div><pre id="log"></pre></footer>
+</div></main>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+const isCanvasOnly = new URLSearchParams(location.search).has('canvas');
+if (isCanvasOnly) {
+  document.body.classList.add('embed-canvas');
+}
+const $=id=>document.getElementById(id);
+const S=[['GENERATE',0xa855f7],['VERIFY',0x22d3ee],['FAIL',0xf43f5e],['ADVISE',0xfbbf24],['RETRY',0xa855f7],['PASS',0x34d399]];
+const CN=['A','B','C','C0','D','E_B'],FACTS=['F-19','F-20','F-25','F-26','F-36','F-37'];
+const N=720,per=N/6,cnt=[0,0,0,0,0,0];let done=0,si=0,running=!matchMedia('(prefers-reduced-motion: reduce)').matches;
+$('conds').innerHTML=CN.map((c,i)=>`<div class="row"><span>${c}</span><div class="bar"><i id="b${i}"></i></div><span id="n${i}">0/${per}</span></div>`).join('');
+$('stages').innerHTML=S.map((s,i)=>`<span id="s${i}">${s[0]}</span>`).join('');
+const logs=[];
+function tick(){
+  if(!running)return;
+  si=(si+1)%6;const hex='#'+S[si][1].toString(16).padStart(6,'0');
+  S.forEach((s,i)=>{const e=$('s'+i);e.style.color=i===si?hex:'';e.style.borderColor=i===si?hex:''});
+  $('stg').textContent=S[si][0];$('stg').style.color=hex;
+  if(si===5){const ci=done%6;done=(done+1)%(N+1);cnt[ci]=Math.min(per,cnt[ci]+1);if(done===0)cnt.fill(0);
+    $('done').textContent=done;$('rem').textContent=(N-done)+' trials remain in the field';
+    cnt.forEach((v,i)=>{$('b'+i).style.width=(v/per*100)+'%';$('n'+i).textContent=v+'/'+per})}
+  logs.push(`${CN[done%6].padEnd(3)} T-${String(done).padStart(3,'0')}  ${S[si][0]}${si===2?'  '+FACTS[done%6]:''}`);
+  if(logs.length>6)logs.shift();$('log').textContent=logs.join('\n');
+}
+setInterval(tick,650);
+$('tg').onclick=()=>{running=!running;$('tg').textContent=running?'PAUSE':'RUN'};
+
+try{
+const cv=$('c'),ren=new THREE.WebGLRenderer({canvas:cv,antialias:true,alpha:true});
+ren.setPixelRatio(Math.min(devicePixelRatio,2));
+const scene=new THREE.Scene(),cam=new THREE.PerspectiveCamera(45,1,.1,100);
+const ctl=new THREE.OrbitControls(cam,cv);ctl.enableDamping=true;ctl.enablePan=false;ctl.minDistance=3;ctl.maxDistance=10;ctl.autoRotate=running;ctl.autoRotateSpeed=.8;
+const g=new THREE.Group();scene.add(g);
+const geo=new THREE.TorusKnotGeometry(1,.34,320,48,2,3),cur=new THREE.Color(0xa855f7),add=THREE.AdditiveBlending;
+const mat=new THREE.ShaderMaterial({transparent:true,depthWrite:false,blending:add,side:THREE.DoubleSide,
+ uniforms:{uT:{value:0},uCol:{value:cur.clone()},uAlt:{value:new THREE.Color(0x22d3ee)}},
+ vertexShader:`varying vec2 vUv;varying vec3 vN;varying vec3 vV;void main(){vUv=uv;vN=normalize(normalMatrix*normal);vec4 mv=modelViewMatrix*vec4(position,1.);vV=normalize(-mv.xyz);gl_Position=projectionMatrix*mv;}`,
+ fragmentShader:`uniform float uT;uniform vec3 uCol,uAlt;varying vec2 vUv;varying vec3 vN;varying vec3 vV;
+ void main(){float f=pow(1.-abs(dot(normalize(vN),normalize(vV))),2.2);
+ float ln=smoothstep(.44,.5,abs(fract(vUv.y*36.)-.5));float rg=smoothstep(.45,.5,abs(fract(vUv.x*128.)-.5));
+ float p=pow(max(0.,sin(vUv.x*18.8496-uT*2.)),24.);
+ vec3 c=mix(uCol,uAlt,.5+.5*sin(vUv.x*12.57+uT*.4));
+ gl_FragColor=vec4(c*(.3+f*1.5)+vec3(p)*.8,clamp(f*.85+ln*.3+rg*.14+p*.9,0.,1.));}`});
+g.add(new THREE.Mesh(geo,mat));
+const wire=new THREE.Mesh(geo,new THREE.MeshBasicMaterial({color:cur,wireframe:true,transparent:true,opacity:.1,blending:add,depthWrite:false}));wire.scale.setScalar(1.015);g.add(wire);
+const halo=new THREE.Mesh(new THREE.TorusKnotGeometry(1,.55,160,24,2,3),new THREE.MeshBasicMaterial({color:cur,transparent:true,opacity:.05,blending:add,side:THREE.BackSide,depthWrite:false}));g.add(halo);
+const P=3000,pos=new Float32Array(P*3);
+for(let i=0;i<P;i++){const u=Math.random()*12.566,q=1.5*u,r=(2+Math.cos(q))*.5,v=new THREE.Vector3(r*Math.cos(u),r*Math.sin(u),Math.sin(q)*.5);
+ const o=new THREE.Vector3().randomDirection?new THREE.Vector3().randomDirection():new THREE.Vector3(Math.random()-.5,Math.random()-.5,Math.random()-.5).normalize();
+ v.addScaledVector(o,.4+Math.random()*.7);pos.set([v.x,v.y,v.z],i*3)}
+const pg=new THREE.BufferGeometry();pg.setAttribute('position',new THREE.BufferAttribute(pos,3));
+const pts=new THREE.Points(pg,new THREE.PointsMaterial({color:cur,size:.014,transparent:true,opacity:.7,blending:add,depthWrite:false}));g.add(pts);
+function size(){const m=cv.parentElement,w=m.clientWidth,h=m.clientHeight;ren.setSize(w,h,false);cam.aspect=w/h;cam.position.z=w/h<1?8:5.4;cam.updateProjectionMatrix()}
+addEventListener('resize',size);size();cam.position.set(0,.4,cam.position.z);
+let sp=1,last=performance.now();
+(function frame(now){requestAnimationFrame(frame);const dt=Math.min(.05,(now-last)/1000);last=now;
+ sp+=((running?1.6:.15)-sp)*.05;mat.uniforms.uT.value+=dt*sp;
+ g.rotation.y+=dt*.2*sp;g.rotation.x+=dt*.08*sp;wire.rotation.y-=dt*.05*sp;pts.rotation.y+=dt*.1*sp;
+ cur.lerp(new THREE.Color(S[si][1]),.06);mat.uniforms.uCol.value.copy(cur);wire.material.color.copy(cur);halo.material.color.copy(cur);pts.material.color.copy(cur);
+ ctl.autoRotate=running;ctl.update();ren.render(scene,cam)})(last);
+}catch(e){$('log').textContent='WebGL unavailable: '+e.message}
+</script></body></html>

@@ -3,14 +3,15 @@ import { motion, useScroll, useSpring, useReducedMotion } from "framer-motion";
 
 const SECTIONS = [
   { id: "home", label: "Overview", code: "01" },
-  { id: "architecture", label: "Architecture", code: "02" },
-  { id: "data", label: "Telemetry", code: "03" },
-  { id: "router", label: "PEP/PDP", code: "04" },
-  { id: "factory", label: "Pipeline", code: "05" },
-  { id: "projects", label: "Systems", code: "06" },
-  { id: "skills", label: "Stack", code: "07" },
-  { id: "about", label: "Architect", code: "08" },
-  { id: "contact", label: "Transmit", code: "09" },
+  { id: "axiom", label: "Axiom", code: "02" },
+  { id: "architecture", label: "Architecture", code: "03" },
+  { id: "data", label: "Telemetry", code: "04" },
+  { id: "router", label: "PEP/PDP", code: "05" },
+  { id: "factory", label: "Pipeline", code: "06" },
+  { id: "projects", label: "Systems", code: "07" },
+  { id: "skills", label: "Stack", code: "08" },
+  { id: "about", label: "Architect", code: "09" },
+  { id: "contact", label: "Transmit", code: "10" },
 ];
 
 export default function ScrollTelemetryRail() {

@@ -39,7 +39,7 @@ export default function MinimalistData() {
         {/* Section Header */}
         <div className="flex flex-col items-start justify-between gap-4 border-b border-white/10 pb-8 sm:flex-row sm:items-end">
           <div>
-            <SectionLabel number={3} text="System Telemetry // Scale" />
+            <SectionLabel number={4} text="System Telemetry // Scale" />
             <h2 className="mt-4 text-4xl font-black tracking-tighter text-white sm:text-5xl md:text-6xl">
               Minimalist Data.{" "}
               <span className="bg-gradient-to-r from-cyan-300 via-teal-200 to-sky-400 bg-clip-text text-transparent">
